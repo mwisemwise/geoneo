@@ -38,6 +38,8 @@ const { buildCompetitorIntelligencePayload } = require('./services/competitorInt
 const { getTracker, upsertItem, deleteItem } = require('./services/fixTracker');
 const { authorizeInternalApi, authorizeInternalOrMember } = require('./services/apiAccess');
 const { loadAdminSummary } = require('./services/adminSummary');
+const { runDeepAudit, filterDeepAuditByTier } = require('./services/auditDeep');
+const { buildCloserSheet } = require('./services/closerSheet');
 const { enrichDomainWithAhrefs } = require('./services/ahrefsClient');
 const {
   normalizeLeadGenQuantity,
@@ -47,6 +49,7 @@ const {
   scoreLeadOpportunity,
   buildOutreachPlan,
   buildAdvancedLeadInsights,
+  listUsStatesForLeadGenUi,
   getAhrefsIntegrationStatus,
   createLeadGenRun,
   getLeadGenRun,
@@ -55,6 +58,9 @@ const {
   saveLeadGenDecision,
   normalizeDomainToken: normalizeLeadGenDomain
 } = require('./services/leadGenBatch');
+const { runLimitedSiteCrawl } = require('./services/siteCrawl');
+const { fetchCitiesForStatePostal } = require('./services/censusPlaces');
+const { loadProspectVerticals } = require('./services/prospectVerticals');
 
 const PORT = process.env.PORT || 4173;
 const HOST = process.env.HOST || '127.0.0.1';
@@ -319,7 +325,8 @@ const QUICK_WIN_IMPACT = {
   sitemap: 2,
   'robots-txt': 1,
   'faq-citation': 2,
-  grammar: 2
+  grammar: 2,
+  'duplicate-titles': 2
 };
 // Year-1 target verticals per docs/POSITIONING.md are listed first.
 // Sub-terms expand detection coverage within each vertical so a site talking
@@ -543,6 +550,15 @@ const ISSUE_SOLUTION_LIBRARY = {
       'Prioritize technical blockers from this audit.',
       'Deploy performance and metadata fixes.',
       'Re-run PageSpeed and compare score delta.'
+    ]
+  },
+  'duplicate-titles': {
+    title: 'Uniquify page title tags',
+    solution: 'Each important URL should have a distinct title that matches page intent (service, topic, or locale).',
+    steps: [
+      'List URLs sharing the same title from the multi-page crawl summary.',
+      'Draft unique titles (primary keyword + page-specific angle, 20–60 characters).',
+      'Publish and re-audit to confirm duplicates are cleared.'
     ]
   }
 };
@@ -1041,7 +1057,7 @@ function seededInt(seedInput, min, max) {
 
 function toCategoryFromCheckKey(key) {
   const normalized = normalizeString(key).toLowerCase();
-  if (['title', 'meta-description', 'og-tags', 'google-seo'].includes(normalized)) return 'seo';
+  if (['title', 'meta-description', 'og-tags', 'google-seo', 'duplicate-titles'].includes(normalized)) return 'seo';
   if (['h1', 'canonical', 'robots-meta', 'structured-data', 'sitemap', 'robots-txt', 'image-alt'].includes(normalized)) return 'technical';
   if (['faq-citation'].includes(normalized)) return 'aiVisibility';
   if (['local-geo'].includes(normalized)) return 'localPresence';
@@ -1071,7 +1087,7 @@ function mapSummaryScoresFromAudit(result) {
   const trustLevel = normalizeString(result && result.trustDesign && result.trustDesign.level).toLowerCase();
   const reputationScore = trustLevel === 'strong' ? 84 : (trustLevel === 'moderate' ? 64 : 42);
   const conversionBase = Number(result && result.scores && result.scores.overall) || 0;
-  const conversionPenalty = checks.filter((item) => ['thin-content', 'paragraph-depth', 'repetitive-content'].includes(item.key) && item.status === 'FIX').length * 8;
+  const conversionPenalty = checks.filter((item) => ['thin-content', 'paragraph-depth', 'repetitive-content', 'duplicate-titles'].includes(item.key) && item.status === 'FIX').length * 8;
   const localVisibilityScore = Number(result?.localSearchVisibility?.summary?.visibilityScore);
   const localPresenceScore = Number.isFinite(localVisibilityScore)
     ? Math.max(0, Math.round((Number(result?.scores?.geo) + localVisibilityScore) / 2))
@@ -2869,23 +2885,23 @@ function buildQueryEngineRows(row) {
     {
       engine: 'Bing',
       rankLabel: 'Unavailable',
-      resultType: 'No live connector',
+      resultType: 'Not queried',
       status: 'unavailable',
-      note: 'Bing engine tracking is not connected in this build yet.'
+      note: 'Only Google is queried live for rankings in this product. This row is a placeholder so the UI is honest about coverage.'
     },
     {
       engine: 'DuckDuckGo',
       rankLabel: 'Unavailable',
-      resultType: 'No live connector',
+      resultType: 'Not queried',
       status: 'unavailable',
-      note: 'DuckDuckGo engine tracking is not connected in this build yet.'
+      note: 'Only Google is queried live for rankings in this product. This row is a placeholder so the UI is honest about coverage.'
     },
     {
       engine: 'Yahoo',
       rankLabel: 'Unavailable',
-      resultType: 'No live connector',
+      resultType: 'Not queried',
       status: 'unavailable',
-      note: 'Yahoo engine tracking is not connected in this build yet.'
+      note: 'Only Google is queried live for rankings in this product. This row is a placeholder so the UI is honest about coverage.'
     }
   ];
 }
@@ -2985,7 +3001,7 @@ function buildGoogleRankingMatrix(result, competitors) {
   const relevancePassed = relevanceKeys.filter((key) => byKey.get(key)?.status === 'PASS').length;
   const crawlKeys = ['canonical', 'robots-meta', 'sitemap', 'robots-txt', 'structured-data', 'image-alt'];
   const crawlPassed = crawlKeys.filter((key) => byKey.get(key)?.status === 'PASS').length;
-  const contentKeys = ['thin-content', 'paragraph-depth', 'repetitive-content'];
+  const contentKeys = ['thin-content', 'paragraph-depth', 'repetitive-content', 'duplicate-titles'];
   const contentPassed = contentKeys.filter((key) => byKey.get(key)?.status === 'PASS').length;
 
   return {
@@ -3068,6 +3084,52 @@ function buildFallbackGoogleRankingMatrix() {
   };
 }
 
+function resolveWebsiteDashboardDataQuality(result) {
+  const localStatus = normalizeString(result?.localSearchVisibility?.status).toLowerCase();
+  const pageSpeedLive = result?.googleGradesSource === 'live_pagespeed';
+  const rankingsOk = localStatus === 'ok';
+  const rankingsPartial = localStatus === 'partial';
+  const rankingsDead = localStatus === 'unavailable' || !localStatus;
+
+  if (rankingsOk && pageSpeedLive) {
+    return {
+      dataQuality: 'real',
+      sourceNote: 'Live Google SERP ranking checks and live PageSpeed Insights grades.'
+    };
+  }
+  if (rankingsOk && !pageSpeedLive) {
+    return {
+      dataQuality: 'real',
+      sourceNote:
+        'Live Google SERP ranking checks. PageSpeed grades are modeled from on-page signals when the PSI snapshot is unavailable or rate-limited.'
+    };
+  }
+  if (rankingsDead && pageSpeedLive) {
+    return {
+      dataQuality: 'estimated',
+      sourceNote:
+        'SERP ranking preview unavailable (provider not configured, blocked, or errors), so ranking-related rows are modeled or incomplete. Live PageSpeed Insights grades are present.'
+    };
+  }
+  if (rankingsPartial && pageSpeedLive) {
+    return {
+      dataQuality: 'estimated',
+      sourceNote:
+        'Mixed: live PageSpeed grades, but some SERP queries failed — ranking rows may be incomplete.'
+    };
+  }
+  if (rankingsPartial && !pageSpeedLive) {
+    return {
+      dataQuality: 'estimated',
+      sourceNote: 'Partial SERP data (some queries failed); PageSpeed grades modeled from on-page signals.'
+    };
+  }
+  return {
+    dataQuality: 'estimated',
+    sourceNote: 'partial signals with estimated components'
+  };
+}
+
 function buildUnifiedModelFromWebsiteAudit(result, input) {
   const summaryScores = mapSummaryScoresFromAudit(result);
   const issues = buildIssuesFromAudit(result);
@@ -3075,10 +3137,7 @@ function buildUnifiedModelFromWebsiteAudit(result, input) {
   const competitors = buildCompetitorsFromAudit(result, input);
   const searchPositioning = buildWebsiteSearchPositioning(result, input);
   const googleRankingMatrix = buildGoogleRankingMatrix(result, competitors);
-  const localStatus = normalizeString(result?.localSearchVisibility?.status).toLowerCase();
-  const dataQuality = localStatus === 'ok' && result?.googleGradesSource === 'live_pagespeed'
-    ? 'real'
-    : (localStatus === 'partial' ? 'estimated' : 'estimated');
+  const { dataQuality, sourceNote } = resolveWebsiteDashboardDataQuality(result);
   return {
     queryType: 'website',
     input: {
@@ -3088,9 +3147,7 @@ function buildUnifiedModelFromWebsiteAudit(result, input) {
       state: normalizeString(input.state)
     },
     dataQuality,
-    sourceNote: dataQuality === 'real'
-      ? 'live website + search signals'
-      : 'partial signals with estimated components',
+    sourceNote,
     summaryScores,
     searchPositioning,
     googleRankingMatrix,
@@ -3268,7 +3325,7 @@ function buildDashboardPackageViews(model) {
 }
 
 function filterAuditResultByPackage(fullResult, packageLevel) {
-  const result = fullResult || {};
+  const { landingPageHtml: _omitLandingPageHtml, ...result } = fullResult || {};
   const level = normalizePackageLevel(packageLevel);
   const localSearchVisibility = filterLocalSearchVisibilityByPackage(result.localSearchVisibility || null, level);
   const allChecks = Array.isArray(result.checks) ? result.checks : [];
@@ -3351,6 +3408,13 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+/** Strips transient/large fields that must not be written to audits.json (see runAudit landingPageHtml). */
+function auditResultForPersistence(full) {
+  if (!full || typeof full !== 'object') return full;
+  const { landingPageHtml: _omit, ...rest } = full;
+  return rest;
 }
 
 function buildAuditRecord({
@@ -3465,7 +3529,7 @@ function buildAuditRecord({
     reportLink: reportLinks.reportPath,
     reportDownloadLink: reportLinks.downloadPath,
     customerResult: filteredForCustomer,
-    fullAuditResult: result
+    fullAuditResult: auditResultForPersistence(result)
   };
 }
 
@@ -3653,7 +3717,7 @@ function buildAuditReportHtml(record) {
   const localRankingFixes = topFixes.slice(0, 3);
   const issueCategoryFromKey = (key) => {
     const normalized = normalizeString(key).toLowerCase();
-    if (['title', 'meta-description', 'og-tags', 'google-seo'].includes(normalized)) return 'SEO';
+    if (['title', 'meta-description', 'og-tags', 'google-seo', 'duplicate-titles'].includes(normalized)) return 'SEO';
     if (['h1', 'canonical', 'robots-meta', 'structured-data', 'sitemap', 'robots-txt', 'image-alt'].includes(normalized)) return 'Technical';
     if (['trust-signals', 'grammar'].includes(normalized)) return 'Trust';
     if (['thin-content', 'paragraph-depth', 'repetitive-content', 'faq-citation'].includes(normalized)) return 'Content';
@@ -4061,7 +4125,7 @@ function fixPriority(check) {
   if (key === 'grammar') {
     return 2;
   }
-  if (key === 'thin-content' || key === 'paragraph-depth') {
+  if (key === 'thin-content' || key === 'paragraph-depth' || key === 'duplicate-titles') {
     return 3;
   }
   if (key === 'trust-signals') {
@@ -4103,6 +4167,15 @@ function htmlToText(html) {
     .replace(/&amp;/gi, '&')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/** Head + tail sample so CMS/stack and footer attribution regexes still match on huge pages without retaining full HTML in persistence. */
+function htmlSampleForSeoProviderScan(html, maxLen = 400000) {
+  const s = String(html || '');
+  if (!s.length) return '';
+  if (s.length <= maxLen) return s;
+  const half = Math.floor(maxLen / 2);
+  return `${s.slice(0, half)}\n${s.slice(s.length - half)}`;
 }
 
 async function runLanguageCheck(text) {
@@ -5487,6 +5560,31 @@ async function runAudit(targetInput, marketOrContext = '') {
     runLanguageCheck(visibleText),
     runGoogleGrades(finalUrl, googleGradesDebugRef)
   ]);
+  let siteCrawl = null;
+  try {
+    siteCrawl = await runLimitedSiteCrawl({
+      seedUrl: finalUrl,
+      initialHtml: html,
+      userAgent: 'GeoNeo-AuditBot/1.0 (+https://geoneo.ai)'
+    });
+  } catch (crawlError) {
+    siteCrawl = {
+      status: 'unavailable',
+      seedUrl: finalUrl,
+      pagesFetched: 0,
+      contentPagesSampled: 0,
+      maxDepth: null,
+      maxPages: null,
+      aggregateWordCount: null,
+      averageWordsPerPage: null,
+      duplicateTitleCount: 0,
+      duplicateTitleGroups: [],
+      stoppedReason: crawlError && crawlError.message ? crawlError.message : 'site_crawl_threw',
+      durationMs: null,
+      robotsDisallowRules: [],
+      pages: []
+    };
+  }
   const googleGradesDebug = googleGrades ? null : (googleGradesDebugRef.reason || 'pagespeed_fetch_failed');
   const googleGradesMessage = googleGrades
     ? null
@@ -5581,6 +5679,42 @@ async function runAudit(targetInput, marketOrContext = '') {
     )
   ];
 
+  const crawlEvaluable =
+    siteCrawl
+    && ['ok', 'partial'].includes(siteCrawl.status)
+    && Number(siteCrawl.contentPagesSampled) >= 2;
+
+  const crawledWithDupes = crawlEvaluable && Number(siteCrawl.duplicateTitleCount) > 0;
+
+  if (crawledWithDupes) {
+    const hint = (siteCrawl.duplicateTitleGroups || []).slice(0, 2).map((g) => `"${g.title}" ×${g.pages}`).join('; ');
+    checks.push(buildCheck(
+      'duplicate-titles',
+      false,
+      `Duplicate <title> tags detected across ${siteCrawl.contentPagesSampled} sampled internal pages.`,
+      `Give each key URL a unique title. Collisions: ${hint || 'see siteCrawl.duplicateTitleGroups'}.`
+    ));
+  } else if (crawlEvaluable) {
+    checks.push(buildCheck(
+      'duplicate-titles',
+      true,
+      `No duplicate <title> tags detected across ${siteCrawl.contentPagesSampled} sampled internal pages.`,
+      `Give each key URL a unique title.`
+    ));
+  } else {
+    const sampled = siteCrawl && siteCrawl.contentPagesSampled != null ? Number(siteCrawl.contentPagesSampled) : 0;
+    const reason =
+      !siteCrawl || siteCrawl.status === 'unavailable'
+        ? 'Site crawl did not complete; duplicate titles were not evaluated.'
+        : `Duplicate title scan needs at least 2 sampled internal pages (sampled: ${sampled}).`;
+    checks.push(buildCheck(
+      'duplicate-titles',
+      true,
+      reason,
+      reason
+    ));
+  }
+
   const failCount = checks.filter((c) => c.status === 'FIX').length;
   const seoPass = checks.slice(0, 10).filter((c) => c.status === 'PASS').length;
   const aiPass = checks.slice(5, 12).filter((c) => c.status === 'PASS').length;
@@ -5645,6 +5779,22 @@ async function runAudit(targetInput, marketOrContext = '') {
     },
     location: market || 'target market'
   });
+  const siteCrawlSummary = {
+    status: siteCrawl.status,
+    seedUrl: siteCrawl.seedUrl || finalUrl,
+    pagesFetched: siteCrawl.pagesFetched,
+    contentPagesSampled: siteCrawl.contentPagesSampled,
+    maxDepth: siteCrawl.maxDepth,
+    maxPages: siteCrawl.maxPages,
+    aggregateWordCount: siteCrawl.aggregateWordCount,
+    averageWordsPerPage: siteCrawl.averageWordsPerPage,
+    duplicateTitleCount: siteCrawl.duplicateTitleCount,
+    duplicateTitleGroups: siteCrawl.duplicateTitleGroups,
+    stoppedReason: siteCrawl.stoppedReason,
+    durationMs: siteCrawl.durationMs,
+    robotsDisallowRules: siteCrawl.robotsDisallowRules,
+    pages: siteCrawl.pages
+  };
   const siteProfile = {
     businessName: detectedBusinessName,
     title,
@@ -5654,6 +5804,7 @@ async function runAudit(targetInput, marketOrContext = '') {
     locationMentions,
     contactSignals,
     internalLinks,
+    siteCrawl: siteCrawlSummary,
     trustSignals: {
       level: trustDesign.level,
       score: trustSignalCount,
@@ -5723,7 +5874,9 @@ async function runAudit(targetInput, marketOrContext = '') {
     googleGradesMessage: googleGrades
       ? null
       : (googleGradesMessage || 'Google PageSpeed snapshot unavailable. Showing estimated grades from on-page audit checks.'),
+    landingPageHtml: htmlSampleForSeoProviderScan(html),
     siteProfile,
+    siteCrawl: siteCrawlSummary,
     localSearchVisibility,
     searchSnapshot: {
       ...searchSnapshot,
@@ -5753,28 +5906,39 @@ function readJsonRequestBody(req, maxBytes = 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
+    let overflow = false;
+    let settled = false;
+    function finish(err, data) {
+      if (settled) return;
+      settled = true;
+      if (err) reject(err);
+      else resolve(data);
+    }
     req.on('data', (chunk) => {
+      if (overflow || settled) return;
       size += chunk.length;
       if (size > maxBytes) {
-        reject(new Error('request_body_too_large'));
-        req.destroy();
+        overflow = true;
+        req.pause();
+        finish(new Error('request_body_too_large'));
         return;
       }
       chunks.push(chunk);
     });
     req.on('end', () => {
+      if (settled || overflow) return;
       const raw = Buffer.concat(chunks).toString('utf8').trim();
       if (!raw) {
-        resolve({});
+        finish(null, {});
         return;
       }
       try {
-        resolve(JSON.parse(raw));
+        finish(null, JSON.parse(raw));
       } catch {
-        reject(new Error('invalid_json_body'));
+        finish(new Error('invalid_json_body'));
       }
     });
-    req.on('error', reject);
+    req.on('error', (e) => finish(e));
   });
 }
 
@@ -5813,6 +5977,8 @@ async function runLeadGenBatch(runId) {
   const queued = await getLeadGenRun(runId);
   if (!queued) return;
   await updateLeadGenRun(runId, (run) => ({ ...run, status: 'running', startedAt: run.startedAt || new Date().toISOString() }));
+
+  let hasCandidateFailures = false;
 
   for (const candidate of queued.candidates || []) {
     const domain = normalizeLeadGenDomain(candidate.domain || candidate.website);
@@ -5860,6 +6026,7 @@ async function runLeadGenBatch(runId) {
       const score = calculateVisibilityScore(buildVisibilityScoreInputFromAudit(record));
       await recordScore(domainKeyFromAuditRecord(record), score);
       const seoProvider = assessSeoProvider({
+        html: result?.landingPageHtml,
         pageTitle: result?.siteProfile?.title,
         visibleText: [
           result?.siteProfile?.title,
@@ -5918,6 +6085,7 @@ async function runLeadGenBatch(runId) {
         ahrefs
       });
     } catch (error) {
+      hasCandidateFailures = true;
       await updateCandidateResult(runId, domain, {
         status: 'failed',
         completedAt: new Date().toISOString(),
@@ -5926,7 +6094,8 @@ async function runLeadGenBatch(runId) {
     }
   }
 
-  await updateLeadGenRun(runId, (run) => ({ ...run, status: 'complete', completedAt: new Date().toISOString() }));
+  const finalStatus = hasCandidateFailures ? 'partial_failed' : 'complete';
+  await updateLeadGenRun(runId, (run) => ({ ...run, status: finalStatus, completedAt: new Date().toISOString() }));
 }
 
 const BRANSON_BATCH_FALLBACK_CANDIDATES = [
@@ -6280,6 +6449,13 @@ function serveStatic(req, res) {
   });
 }
 
+/** Two-letter USPS state for /api/geo/cities (uppercase A–Z only). */
+function normalizeApiStateParam(raw) {
+  const s = String(raw || '').trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(s)) return null;
+  return s;
+}
+
 async function requestHandler(req, res) {
   const reqUrl = new URL(req.url, `http://${req.headers.host}`);
 
@@ -6439,6 +6615,134 @@ async function requestHandler(req, res) {
     return;
   }
 
+  // Deep audit — fans out to schema/eeat/geo analyzers + dollarLift, returns
+  // unified shape. Tier filter applied via ?tier=free|silver|gold|admin.
+  if (reqUrl.pathname === '/api/audit-deep' && req.method === 'GET') {
+    try {
+      const url = (reqUrl.searchParams.get('url') || '').trim();
+      if (!url) {
+        sendJson(res, 400, { error: 'url required' });
+        return;
+      }
+      const industry = (reqUrl.searchParams.get('industry') || '').trim();
+      const city = (reqUrl.searchParams.get('city') || '').trim();
+      const state = (reqUrl.searchParams.get('state') || '').trim();
+      const tier = (reqUrl.searchParams.get('tier') || 'free').trim();
+      const businessName = (reqUrl.searchParams.get('businessName') || '').trim();
+
+      // Fetch the target page + robots + llms.txt in parallel
+      const target = safeUrl(url);
+      if (!target) {
+        sendJson(res, 400, { error: 'invalid url' });
+        return;
+      }
+      const origin = `${target.protocol}//${target.host}`;
+      const [pageHtml, robotsTxt, llmsTxtContent] = await Promise.all([
+        fetchHtmlWithTimeout(target.href, 12000),
+        fetchHtmlWithTimeout(`${origin}/robots.txt`, 5000),
+        fetchHtmlWithTimeout(`${origin}/llms.txt`, 5000)
+      ]);
+      const html = pageHtml || '';
+      const finalUrl = target.href;
+
+      const businessFacts = {
+        businessName: businessName || inferBusinessName({
+          explicitName: businessName,
+          h1: textBetween(html, '<h1', '</h1>'),
+          title: textBetween(html, '<title', '</title>'),
+          hostname: target.hostname
+        }),
+        url: finalUrl,
+        city, state,
+        description: textBetween(html, '<meta name="description" content="', '">') ||
+                     textBetween(html, '<meta property="og:description" content="', '">') || ''
+      };
+
+      const deepResult = await runDeepAudit({
+        html, finalUrl, robotsTxt, llmsTxtContent,
+        industry, city, state,
+        businessFacts
+      });
+
+      const filtered = filterDeepAuditByTier(deepResult, tier);
+      sendJson(res, 200, { ok: true, tier, audit: filtered });
+    } catch (e) {
+      sendJson(res, 500, { error: e.message || 'deep audit failed' });
+    }
+    return;
+  }
+
+  // Closer Sheet — assembles the 1-2 page sales artifact from deep audit +
+  // prospect intel + their current monthly spend.
+  if (reqUrl.pathname === '/api/closer-sheet' && req.method === 'POST') {
+    if (!authorizeInternalApi(req)) {
+      sendApiForbidden(res);
+      return;
+    }
+    let raw = '';
+    req.on('data', (c) => { raw += c; if (raw.length > 200000) req.destroy(); });
+    req.on('end', async () => {
+      try {
+        const body = raw ? JSON.parse(raw) : {};
+        const url = String(body.url || '').trim();
+        if (!url) {
+          sendJson(res, 400, { error: 'url required' });
+          return;
+        }
+        const target = safeUrl(url);
+        const origin = `${target.protocol}//${target.host}`;
+        const [pageHtml, robotsRaw, llmsRaw] = await Promise.all([
+          fetchHtmlWithTimeout(target.href, 12000),
+          fetchHtmlWithTimeout(`${origin}/robots.txt`, 5000),
+          fetchHtmlWithTimeout(`${origin}/llms.txt`, 5000)
+        ]);
+        const html = pageHtml || '';
+        const finalUrl = target.href;
+        const robotsTxt = robotsRaw || '';
+        const llmsTxtContent = llmsRaw || null;
+
+        const prospect = {
+          businessName: body.businessName || '',
+          domain: target.hostname,
+          industry: body.industry || '',
+          city: body.city || '',
+          state: body.state || '',
+          contactName: body.contactName || '',
+          phone: body.phone || '',
+          email: body.email || '',
+          currentMonthlySpend: Number(body.currentMonthlySpend) || 0,
+          currentVendor: body.currentVendor || '',
+          yearsInBusiness: Number(body.yearsInBusiness) || 0,
+          locationCount: Number(body.locationCount) || 1
+        };
+
+        const businessFacts = {
+          businessName: prospect.businessName,
+          url: finalUrl,
+          city: prospect.city,
+          state: prospect.state
+        };
+
+        const deep = await runDeepAudit({
+          html, finalUrl, robotsTxt, llmsTxtContent,
+          industry: prospect.industry, city: prospect.city, state: prospect.state,
+          businessFacts
+        });
+
+        const sheet = buildCloserSheet({
+          prospect,
+          audit: deep,
+          allFindings: deep.findings || []
+        });
+
+        sendJson(res, 200, { ok: true, sheet, audit: deep });
+      } catch (e) {
+        sendJson(res, 500, { error: e.message || 'closer sheet failed' });
+      }
+    });
+    return;
+  }
+
   if (reqUrl.pathname === '/api/admin/audits/debug' && req.method === 'GET') {
     if (!authorizeInternalApi(req)) {
       sendApiForbidden(res);
@@ -6489,6 +6793,72 @@ async function requestHandler(req, res) {
       });
     } catch (e) {
       sendJson(res, 500, { ok: false, operator: true, error: e.message || 'audit debug failed' });
+    }
+    return;
+  }
+
+  /** Public prospect vertical groups for admin + audit forms (single source: data/prospect-verticals.json). */
+  if (reqUrl.pathname === '/api/geo/prospect-verticals' && req.method === 'GET') {
+    try {
+      const data = loadProspectVerticals(ROOT);
+      sendJson(res, 200, { ok: true, ...data });
+    } catch (e) {
+      sendJson(res, 500, { ok: false, error: e.message || 'prospect_verticals_failed' });
+    }
+    return;
+  }
+
+  /** Public U.S. state list for marketing audit forms (no auth). */
+  if (reqUrl.pathname === '/api/geo/us-states' && req.method === 'GET') {
+    const states = listUsStatesForLeadGenUi()
+      .map(({ code, name }) => ({ code, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    sendJson(res, 200, { ok: true, states });
+    return;
+  }
+
+  /** Public Census-backed city list for a state (cached server-side; no auth). */
+  if (reqUrl.pathname === '/api/geo/cities' && req.method === 'GET') {
+    const stateParam = normalizeApiStateParam(reqUrl.searchParams.get('state') || '');
+    if (!stateParam) {
+      sendJson(res, 400, { ok: false, error: 'invalid_state' });
+      return;
+    }
+    try {
+      const data = await fetchCitiesForStatePostal(stateParam);
+      sendJson(res, 200, { ok: true, ...data });
+    } catch (error) {
+      const code = error && error.message === 'unknown_state' ? 400 : 502;
+      sendJson(res, code, { ok: false, error: error.message || 'cities_fetch_failed' });
+    }
+    return;
+  }
+
+  if (reqUrl.pathname === '/api/admin/lead-gen/us-states' && req.method === 'GET') {
+    if (!authorizeInternalApi(req)) {
+      sendApiForbidden(res);
+      return;
+    }
+    sendJson(res, 200, { ok: true, states: listUsStatesForLeadGenUi() });
+    return;
+  }
+
+  if (reqUrl.pathname === '/api/admin/lead-gen/cities' && req.method === 'GET') {
+    if (!authorizeInternalApi(req)) {
+      sendApiForbidden(res);
+      return;
+    }
+    const stateParam = normalizeApiStateParam(reqUrl.searchParams.get('state') || '');
+    if (!stateParam) {
+      sendJson(res, 400, { ok: false, error: 'invalid_state' });
+      return;
+    }
+    try {
+      const data = await fetchCitiesForStatePostal(stateParam);
+      sendJson(res, 200, { ok: true, ...data });
+    } catch (error) {
+      const code = error && error.message === 'unknown_state' ? 400 : 502;
+      sendJson(res, code, { ok: false, error: error.message || 'cities_fetch_failed' });
     }
     return;
   }
@@ -7716,5 +8086,6 @@ module.exports = Object.assign(requestHandler, {
   buildNeoClubPayload,
   runAudit,
   buildPrioritizedActionPlan,
-  buildCompetitorsFromAudit
+  buildCompetitorsFromAudit,
+  resolveWebsiteDashboardDataQuality
 });
