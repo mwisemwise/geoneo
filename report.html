@@ -184,8 +184,13 @@
 
       var html = '';
       html += '<div class="report-header">';
-      html += '<h1>Visibility Report</h1>';
-      html += '<p>' + esc(businessLabel) + (city ? ' — ' + esc(city) + (state ? ', ' + esc(state) : '') : '') + '</p>';
+      if (mode === 'market') {
+        html += '<h1>Industry Market Report</h1>';
+        html += '<p>' + esc((industry || businessLabel)) + ' in ' + esc(city || 'your area') + (state ? ', ' + esc(state) : '') + '</p>';
+      } else {
+        html += '<h1>Visibility Report</h1>';
+        html += '<p>' + esc(businessLabel) + (city ? ' — ' + esc(city) + (state ? ', ' + esc(state) : '') : '') + '</p>';
+      }
       html += '</div>';
 
       if (hasNoData && mode === 'market') {
@@ -236,8 +241,13 @@
       // Top fixes
       if (fixes.length) {
         html += '<div class="report-section">';
-        html += '<h2>What to Fix First</h2>';
-        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These are the changes that will have the biggest impact on your visibility. Listed in priority order.</p>';
+        if (mode === 'market') {
+          html += '<h2>How to Win This Market</h2>';
+          html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">Based on the current competitive landscape, here\'s the strategy to capture market share.</p>';
+        } else {
+          html += '<h2>What to Fix First</h2>';
+          html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These are the changes that will have the biggest impact on your visibility. Listed in priority order.</p>';
+        }
         var topFixes = fixes.slice(0, 5);
         for (var i = 0; i < topFixes.length; i++) {
           html += renderFix(i + 1, topFixes[i]);
@@ -248,8 +258,13 @@
       // Competitor comparison
       if (competitors.length) {
         html += '<div class="report-section">';
-        html += '<h2>How You Compare to Local Competitors</h2>';
-        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These businesses show up when customers search for your type of service in your area.</p>';
+        if (mode === 'market') {
+          html += '<h2>Who Dominates This Market</h2>';
+          html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These are the businesses currently capturing the most search visibility for ' + esc(industry || 'this industry') + ' in ' + esc(city || 'this area') + '.</p>';
+        } else {
+          html += '<h2>How You Compare to Local Competitors</h2>';
+          html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These businesses show up when customers search for your type of service in your area.</p>';
+        }
         html += renderCompetitors(competitors.slice(0, 3), overall);
         html += '</div>';
       }
@@ -272,9 +287,14 @@
 
       // CTA
       html += '<div class="cta-box">';
-      html += '<h3>Want help fixing these issues?</h3>';
-      html += '<p>We can implement these fixes for you or guide your web team through them.</p>';
-      html += '<a class="btn btn-hot" href="mailto:hello@geoneo.ai?subject=Visibility%20Audit%20Follow-up&body=I%20just%20ran%20an%20audit%20for%20' + encodeURIComponent(businessLabel) + '%20and%20would%20like%20help.">Get Help With My Fixes</a>';
+      if (mode === 'market') {
+        html += '<h3>Ready to dominate this market?</h3>';
+        html += '<p>We can build the visibility strategy to put you at the top of this industry in ' + esc(city || 'your area') + '.</p>';
+      } else {
+        html += '<h3>Want help fixing these issues?</h3>';
+        html += '<p>We can implement these fixes for you or guide your web team through them.</p>';
+      }
+      html += '<a class="btn btn-hot" href="mailto:hello@geoneo.ai?subject=' + encodeURIComponent((mode === 'market' ? 'Market Report: ' : 'Visibility Audit: ') + businessLabel) + '&body=I%20just%20ran%20a%20report%20and%20would%20like%20help.">Get Started</a>';
       html += '</div>';
 
       document.getElementById('reportMain').innerHTML = html;
@@ -328,6 +348,11 @@
     }
 
     function gradeFromScore(s) {
+      if (mode === 'market') {
+        if (s >= 80) return { label: 'Highly competitive market — strong players dominate', cls: 'bad' };
+        if (s >= 55) return { label: 'Moderate competition — real opportunity exists for a strong new player', cls: 'ok' };
+        return { label: 'Low competition — wide open for a business that shows up correctly', cls: 'good' };
+      }
       if (s >= 80) return { label: 'Strong visibility — keep building on this foundation', cls: 'good' };
       if (s >= 55) return { label: 'Moderate visibility — customers are finding competitors before you', cls: 'ok' };
       return { label: 'Low visibility — you are likely invisible to most potential customers', cls: 'bad' };
@@ -350,7 +375,53 @@
 
     function renderFindings(scores, issues, searchPos) {
       var html = '';
-      // Google/Business presence
+
+      if (mode === 'market') {
+        // Market mode: show industry state, not "your business" language
+        var competitive = (scores.seo || 0) >= 60;
+        html += finding(competitive ? 'warn' : 'pass',
+          competitive
+            ? 'This market has established competitors with strong search presence.'
+            : 'This market has weak search competition — there is room to dominate.',
+          competitive
+            ? 'Existing businesses are actively investing in visibility. A new entrant needs differentiation to break in.'
+            : 'Most businesses in this space are not optimizing their online presence. A well-positioned business can quickly take the top spots.'
+        );
+
+        var localStrong = (scores.localPresence || 0) >= 60;
+        html += finding(localStrong ? 'warn' : 'pass',
+          localStrong
+            ? 'Local businesses are showing up in Maps and local results.'
+            : 'Few businesses are properly set up for Google Maps and local search.',
+          localStrong
+            ? 'The Google Maps 3-pack is contested. Winning it requires strong reviews, accurate NAP, and local content.'
+            : 'The local pack is underserved. A business with proper Google Business Profile setup and reviews can own this space quickly.'
+        );
+
+        var dirHeavy = (scores.conversionUx || 0) >= 40;
+        html += finding(dirHeavy ? 'warn' : 'pass',
+          dirHeavy
+            ? 'Directories (Yelp, Angi, etc.) occupy significant search real estate in this market.'
+            : 'Directories have minimal presence — standalone business websites can rank directly.',
+          dirHeavy
+            ? 'When directories dominate, it means local businesses haven\'t built strong enough websites to outrank them. This is an opportunity.'
+            : 'Customers searching this industry are more likely to land on actual business websites rather than directory listings.'
+        );
+
+        var aiReady = (scores.aiVisibility || 0) >= 50;
+        html += finding(aiReady ? 'pass' : 'fix',
+          aiReady
+            ? 'Some businesses in this market are set up for AI search recommendations.'
+            : 'Almost no businesses in this market are optimized for AI search (ChatGPT, Google AI).',
+          aiReady
+            ? 'Early movers are positioning for AI citations. Matching their approach is important.'
+            : 'This is a major opportunity. The first business to properly structure content for AI recommendations will have a significant advantage.'
+        );
+
+        return html;
+      }
+
+      // Website mode: original "your business" language
       var googleOk = (scores.seo || 0) >= 65 && (scores.localPresence || 0) >= 60;
       html += finding(googleOk ? 'pass' : 'fix',
         googleOk
@@ -465,7 +536,11 @@
         html += '<td style="font-size:0.82rem;color:var(--muted)">' + esc(advantage) + '</td></tr>';
       }
       html += '</tbody></table>';
-      html += '<p style="font-size:0.82rem;color:var(--muted);margin-top:0.75rem;">These competitors are capturing customers that could be yours. The fixes above will help you close the gap.</p>';
+      if (mode === 'market') {
+        html += '<p style="font-size:0.82rem;color:var(--muted);margin-top:0.75rem;">These are the current market leaders. A new or existing business that addresses the gaps above can compete with or surpass them.</p>';
+      } else {
+        html += '<p style="font-size:0.82rem;color:var(--muted);margin-top:0.75rem;">These competitors are capturing customers that could be yours. The fixes above will help you close the gap.</p>';
+      }
       return html;
     }
 
