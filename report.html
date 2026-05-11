@@ -124,6 +124,8 @@
       }
     }, 8000);
 
+    var mode = ''; // set in renderReport, used by gradeFromScore
+
     fetch('/api/audit?' + apiParams.toString())
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -148,7 +150,7 @@
 
     function renderReport(data) {
       var scores = data.summaryScores || {};
-      var mode = data.mode || data.queryType || 'website';
+      mode = data.mode || data.queryType || 'website';
       var issues = data.issues || [];
       var fixes = data.fixes || [];
       var competitors = data.competitors || [];
