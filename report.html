@@ -124,7 +124,7 @@
       }
     }, 8000);
 
-    fetch('/api/audit?' + apiParams.toString(), { signal: AbortSignal.timeout(60000) })
+    fetch('/api/audit?' + apiParams.toString())
       .then(function(r) { return r.json(); })
       .then(function(data) {
         clearInterval(msgInterval);
@@ -136,7 +136,7 @@
       })
       .catch(function(err) {
         clearInterval(msgInterval);
-        showError('Something went wrong', 'Please try again in a moment.');
+        showError('Something went wrong', err.message || 'Please try again in a moment.');
       });
 
     function showError(title, msg) {
