@@ -3,449 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoNeo AI | AI-Search Visibility for Ozarks Home-Service Contractors</title>
-  <meta name="description" content="Free 60-second scan for plumbers, HVAC, roofers, electricians, and home-service contractors in the Ozarks. See what Google, Google Maps, and ChatGPT say about your business — plus the 3 fixes to make this week." />
+  <title>GeoNeo AI | Free AI Visibility Audit for Local Businesses</title>
+  <meta name="description" content="Find out how visible your business is in Google, Maps, directories, and AI search. Free audit with plain-English fixes you can act on today." />
   <meta name="robots" content="index, follow" />
-  <meta property="og:title" content="GeoNeo AI | Is ChatGPT recommending your competitor instead of you?" />
-  <meta property="og:description" content="Free AI-search visibility scan for Ozarks home-service contractors. See your Google, Maps, and ChatGPT rankings plus the 3 fixes to make this week." />
+  <meta property="og:title" content="GeoNeo AI | How Visible Is Your Business?" />
+  <meta property="og:description" content="Free AI visibility audit. See your Google, Maps, directory, and AI search presence — plus the fixes to make this week." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://geoneo.ai/" />
   <meta property="og:image" content="https://geoneo.ai/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GeoNeo AI | AI-Search Visibility for Ozarks Contractors" />
-  <meta name="twitter:description" content="Free 60-second scan. See your Google, Maps, and ChatGPT rankings — plus the 3 fixes to make this week." />
-  <meta name="twitter:image" content="https://geoneo.ai/og-image.png" />
+  <link rel="canonical" href="https://geoneo.ai/" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>G</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="canonical" href="https://geoneo.ai/" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>G</text></svg>" />
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "GeoNeo AI",
-      "description": "GeoNeo AI audits local businesses across Google Search, Google Maps, and AI search results to deliver prioritized fix plans and competitive intelligence.",
-      "url": "https://geoneo.ai",
-      "address": { "@type": "PostalAddress", "addressLocality": "Branson", "addressRegion": "MO", "postalCode": "65616", "addressCountry": "US" },
-      "geo": { "@type": "GeoCoordinates", "latitude": 36.6436, "longitude": -93.2185 },
-      "areaServed": [{ "@type": "Country", "name": "United States" }],
-      "priceRange": "$$",
-      "serviceType": ["SEO Audit", "Local SEO", "AI Citation Optimization"]
-    }
-  </script>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        { "@type": "Question", "name": "Is the GeoNeo AI audit really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The basic audit is completely free — no signup, no credit card. You get real scores and a summary of what's wrong. Silver and Gold unlock the full fix list with exact changes to make." } },
-        { "@type": "Question", "name": "What is AI citation and why should my business care?", "acceptedAnswer": { "@type": "Answer", "text": "When someone asks ChatGPT or Google AI for a recommendation in your industry and city, it cites specific businesses. AI citation optimization makes sure your business is the one being recommended instead of your competitors." } },
-        { "@type": "Question", "name": "How is GeoNeo different from hiring an SEO agency?", "acceptedAnswer": { "@type": "Answer", "text": "Agencies charge $800-$3,000/month and send reports you don't read. GeoNeo gives you a one-time, plain-English fix list you can act on today or hand to any web person to implement. No retainer, no contract." } }
-      ]
-    }
-  </script>
   <style>
-    /* ═══ NEW LANDING PAGE STYLES ═══ */
-    .hero-new {
-      min-height: calc(100vh - 140px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 1.5rem 0 1rem;
-    }
-    .hero-new h1 {
-      font-size: clamp(2rem, 6vw, 3.8rem);
-      margin: 0 0 1rem;
-      line-height: 1.1;
-      max-width: 100%;
-    }
-    .hero-headline {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2em;
-    }
-    .hero-line {
-      display: block;
-    }
-    .hero-green-line {
-      /* Small vertical breathing room above and below the rotating word
-         so it reads as its own visual beat. */
-      margin: 0.15em 0;
-    }
-    .hero-new .hero-sub {
-      color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      max-width: 640px;
-      margin: 0 auto 1.25rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-    }
-    .hero-sub-line {
-      display: block;
-    }
-    .hero-sub-line strong {
-      color: var(--ink);
-      font-weight: 600;
-    }
-    .hero-offer {
-      color: var(--brand);
-      font-weight: 600;
-      margin-top: 0.4rem;
-    }
-    .hero-question {
-      color: var(--ink);
-    }
-
-    /* ═══ HERO PILLARS (what we check) ═══ */
-    .hero-pillars {
-      list-style: none;
-      margin: 0 auto 2rem;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .hero-pillar {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.65rem 1.1rem;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.02);
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .hero-pillar:hover {
-      border-color: rgba(0, 229, 160, 0.4);
-      background: rgba(0, 229, 160, 0.06);
-    }
-    .hero-pillar-icon {
-      font-size: 1rem;
-      line-height: 1;
-    }
-    .hero-pillar-label {
-      font-size: 0.92rem;
-      color: var(--ink);
-      font-weight: 500;
-    }
-    .rotating-word {
-      display: inline-block;
-      color: var(--brand);
-      /* Reserve width for the longest industry variant so its own line
-         stays centered and the surrounding lines don't shift. */
-      min-width: 20ch;
-      text-align: center;
-      transition: opacity 0.55s ease, transform 0.55s ease;
-    }
-    .rotating-word.fade-out {
-      opacity: 0;
-      transform: translateY(-6px);
-    }
-    /* Location rotator: whole phrase ("in Nixa", "near me",
-       "in the Ozark Mountains") is green, centered, and sits on its
-       own line below the industry. Longest variant is
-       "in the Ozark Mountains" (~22 chars). */
-    .rotating-location {
-      display: inline-block;
-      color: var(--brand);
-      min-width: 22ch;
-      text-align: center;
-      transition: opacity 0.55s ease, transform 0.55s ease;
-    }
-    .rotating-location.fade-out {
-      opacity: 0;
-      transform: translateY(-6px);
-    }
-    /* On narrow screens the fixed widths force horizontal overflow;
-       let rotators auto-size. */
-    @media (max-width: 640px) {
-      .rotating-word,
-      .rotating-location { min-width: 0; }
-    }
-
-    /* ═══ SCAN INPUT ═══ */
-    .scan-box {
-      width: 100%;
-      max-width: 560px;
-      margin: 0 auto;
-    }
-    .scan-input-wrap {
-      display: flex;
-      gap: 0;
-      border-radius: 16px;
-      border: 2px solid var(--line);
-      background: var(--surface);
-      overflow: hidden;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .scan-input-wrap:focus-within {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 4px rgba(0, 229, 160, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-    .scan-input-wrap input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      color: var(--ink);
-      font-size: 1.1rem;
-      padding: 1.1rem 1.4rem;
-      outline: none;
-      font-family: inherit;
-    }
-    .scan-input-wrap input::placeholder {
-      color: var(--muted);
-    }
-    .scan-input-wrap button {
-      border: none;
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color: #0a0f1a;
-      font-weight: 700;
-      font-size: 0.95rem;
-      padding: 1.1rem 1.8rem;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-      transition: filter 0.2s ease, transform 0.2s ease;
-    }
-    .scan-input-wrap button:hover {
-      filter: brightness(1.1);
-      transform: scale(1.02);
-    }
-    .scan-trust {
-      margin-top: 0.75rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .scan-trust span {
-      margin: 0 0.4rem;
-      opacity: 0.4;
-    }
-
-    /* ═══ LIVE TICKER ═══ */
-    /* Full-viewport-width ticker: renders as a sibling of .hero-new,
-       outside any .container, so it spans the entire screen edge-to-edge
-       and its animation is isolated from any hero-height changes. */
-    .live-ticker {
-      width: 100%;
-      overflow: hidden;
-      height: 1.6rem;
-      position: relative;
-      margin: 1rem 0 2.5rem;
-    }
-    .live-ticker::before,
-    .live-ticker::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 80px;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .live-ticker::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
-    .live-ticker::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
-    .ticker-track {
-      display: flex;
-      gap: 2rem;
-      /* Longer duration so perceived speed is steady across the full
-         viewport width. */
-      animation: ticker-scroll 60s linear infinite;
-      white-space: nowrap;
-      will-change: transform;
-    }
-    .ticker-item {
-      font-size: 0.78rem;
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .ticker-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--brand);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes ticker-scroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* ═══ SCAN COUNTER ═══ */
-    .scan-counter {
-      margin-top: 1rem;
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-    }
-    .scan-counter strong {
-      color: var(--brand);
-      font-weight: 700;
-    }
-
-    /* ═══ HOW STRIP ═══ */
-    .how-strip {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      padding: 2rem 0;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .how-step {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .how-step .step-num {
-      width: 1.6rem;
-      height: 1.6rem;
-      border-radius: 50%;
-      background: rgba(0, 229, 160, 0.12);
-      color: var(--brand);
-      display: grid;
-      place-items: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .how-arrow {
-      color: var(--line);
-      font-size: 1.2rem;
-    }
-
-    /* ═══ PROOF SECTION (simplified) ═══ */
-    .proof-section {
-      text-align: center;
-    }
-    .proof-section h2 {
-      font-size: clamp(1.4rem, 3.5vw, 2rem);
-      margin: 0 0 0.5rem;
-    }
-    .proof-section .proof-sub {
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto 2rem;
-    }
-    .proof-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-    .proof-card {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 18px;
-      padding: 1.5rem 1rem;
-      text-align: center;
-    }
-    .proof-card .grade {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-    .proof-card .grade.bad { color: #ff6b6b; }
-    .proof-card .grade.warn { color: #ffa657; }
-    .proof-card .grade.good { color: var(--brand); }
-    .proof-card h3 { margin: 0.5rem 0 0.3rem; font-size: 1rem; }
-    .proof-card p { color: var(--muted); font-size: 0.85rem; margin: 0; }
-
-    /* ═══ FEATURES ROW ═══ */
-    .features-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-    .feature-card {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 18px;
-      padding: 1.5rem;
-      text-align: center;
-    }
-    .feature-card .feature-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    .feature-card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
-    .feature-card p { color: var(--muted); font-size: 0.88rem; margin: 0; }
-
-    /* ═══ FAQ (2-col) ═══ */
-    .faq-section { max-width: 800px; margin: 0 auto; }
+    .hero-new { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem 1rem; }
+    .hero-new h1 { font-size: clamp(1.8rem, 5vw, 3.2rem); margin: 0 0 1rem; line-height: 1.15; max-width: 720px; }
+    .hero-new .hero-sub { color: var(--muted); font-size: clamp(1rem, 2vw, 1.2rem); max-width: 600px; margin: 0 auto 2rem; }
+    .hero-new .hero-sub strong { color: var(--ink); }
+    .audit-box { width: 100%; max-width: 520px; margin: 0 auto; }
+    .audit-box form { display: flex; flex-direction: column; gap: 0.75rem; }
+    .audit-box label { font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 0.3rem; }
+    .audit-box input { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font-size: 1rem; padding: 0.85rem 1rem; border-radius: 10px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+    .audit-box input:focus { border-color: var(--brand); }
+    .audit-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .audit-box button { margin-top: 0.5rem; border: none; background: linear-gradient(135deg, var(--brand), var(--brand-strong)); color: #0a0f1a; font-weight: 700; font-size: 1.05rem; padding: 1rem; border-radius: 12px; cursor: pointer; font-family: inherit; transition: filter 0.2s, transform 0.2s; }
+    .audit-box button:hover { filter: brightness(1.1); transform: scale(1.01); }
+    .audit-box .trust-line { text-align: center; margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
+    .pillars { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .pillar { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border: 1px solid var(--line); border-radius: 999px; font-size: 0.85rem; color: var(--ink); }
+    .how-section { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; padding: 2.5rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .how-step { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--muted); }
+    .how-step .num { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: rgba(0,229,160,0.12); color: var(--brand); display: grid; place-items: center; font-size: 0.75rem; font-weight: 700; }
+    .value-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .value-card { border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 1.5rem; text-align: center; }
+    .value-card .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .value-card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+    .value-card p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+    .faq-section { max-width: 700px; margin: 0 auto; }
     .faq-section h2 { text-align: center; margin-bottom: 1.5rem; }
-    .faq-grid-new {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-    .faq-grid-new details {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 1rem 1.2rem;
-    }
-    .faq-grid-new summary {
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.92rem;
-      list-style: none;
-    }
-    .faq-grid-new summary::-webkit-details-marker { display: none; }
-    .faq-grid-new details p {
-      color: var(--muted);
-      font-size: 0.88rem;
-      margin: 0.6rem 0 0;
-    }
-
-    /* ═══ FINAL CTA ═══ */
-    .final-cta {
-      text-align: center;
-      padding-bottom: 4rem;
-    }
-    .final-cta h2 {
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      margin: 0 0 0.5rem;
-    }
-    .final-cta p {
-      color: var(--muted);
-      max-width: 480px;
-      margin: 0 auto 1.5rem;
-    }
-
-    /* ═══ RESPONSIVE ═══ */
-    @media (max-width: 700px) {
-      .proof-cards, .features-row { grid-template-columns: 1fr; }
-      .faq-grid-new { grid-template-columns: 1fr; }
-      .how-strip { flex-direction: column; align-items: center; gap: 0.75rem; }
-      .how-arrow { display: none; }
-      .scan-input-wrap { flex-direction: column; border-radius: 14px; }
-      .scan-input-wrap button { border-radius: 0 0 12px 12px; padding: 1rem; }
-    }
+    .faq-section details { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; }
+    .faq-section summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; list-style: none; }
+    .faq-section summary::-webkit-details-marker { display: none; }
+    .faq-section details p { color: var(--muted); font-size: 0.88rem; margin: 0.5rem 0 0; }
+    .final-cta { text-align: center; padding: 3rem 0; }
+    .final-cta h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); margin: 0 0 0.5rem; }
+    .final-cta p { color: var(--muted); max-width: 480px; margin: 0 auto 1.5rem; }
+    @media (max-width: 600px) { .audit-box .row { grid-template-columns: 1fr; } .how-section { flex-direction: column; align-items: center; } }
   </style>
 </head>
 <body>
-
   <header class="site-header container">
     <a class="brand" href="#top" aria-label="GeoNeo AI home">
       <span class="brand-mark" aria-hidden="true">G</span>
@@ -453,293 +62,131 @@
     </a>
     <nav class="nav" aria-label="Primary">
       <a href="#how">How It Works</a>
-      <a href="#proof">Results</a>
-      <a href="branson-report.html">Branson Report</a>
+      <a href="#faq">FAQ</a>
     </nav>
   </header>
 
   <main id="top">
-
-    <!-- ═══ HERO: One input, one action ═══ -->
     <section class="hero-new container">
-      <h1 class="hero-headline">
-        <span class="hero-line">Your next customer is asking ChatGPT</span>
-        <span class="hero-line hero-question">"Who's the best</span>
-        <span class="hero-line hero-green-line"><span id="rotating-industry" class="rotating-word">Plumber</span></span>
-        <span class="hero-line hero-green-line"><span id="rotating-location" class="rotating-word rotating-location">in Nixa?"</span></span>
-      </h1>
-      <p class="hero-sub">
-        <span class="hero-sub-line"><strong>Will it be you — or your competition?</strong></span>
-        <span class="hero-sub-line">60-second audit for local Ozark Mountain / 417 area businesses.</span>
-        <span class="hero-sub-line hero-offer">See the 3 fixes you need to make this week.</span>
-      </p>
-      <ul class="hero-pillars" aria-label="What we check in every audit">
-        <li class="hero-pillar">
-          <span class="hero-pillar-icon" aria-hidden="true">🔍</span>
-          <span class="hero-pillar-label glossary" data-term="organic-rank" tabindex="0">Google Ranking</span>
-        </li>
-        <li class="hero-pillar">
-          <span class="hero-pillar-icon" aria-hidden="true">📍</span>
-          <span class="hero-pillar-label glossary" data-term="map-pack" tabindex="0">Map Pack</span>
-        </li>
-        <li class="hero-pillar">
-          <span class="hero-pillar-icon" aria-hidden="true">🤖</span>
-          <span class="hero-pillar-label glossary" data-term="ai-citation" tabindex="0">AI Citation</span>
-        </li>
-      </ul>
+      <h1>Find out how visible your business is in Google, Maps, directories, and AI search.</h1>
+      <p class="hero-sub">Most local businesses are invisible in the places customers actually look. <strong>Get a free audit in 60 seconds</strong> — with plain-English fixes you can act on today.</p>
 
-      <div class="scan-box">
-        <form class="scan-input-wrap" id="scanForm" action="both-audit.html" method="get">
-          <input type="text" name="url" placeholder="Website URL, business name, or industry + city..." autocomplete="off" required aria-label="Enter a website, business name, or industry and city" />
-          <button type="submit">Scan My Business</button>
+      <div class="pillars">
+        <span class="pillar">🔍 Google Search</span>
+        <span class="pillar">📍 Google Maps</span>
+        <span class="pillar">📂 Directories</span>
+        <span class="pillar">🤖 AI Search</span>
+      </div>
+
+      <div class="audit-box">
+        <form id="auditForm">
+          <label>Business website OR name
+            <input type="text" name="url" placeholder="www.example.com or 'Joe's Plumbing'" required autocomplete="off" />
+          </label>
+          <div class="row">
+            <label>City
+              <input type="text" name="city" placeholder="Dallas" />
+            </label>
+            <label>State
+              <input type="text" name="state" placeholder="TX" maxlength="2" />
+            </label>
+          </div>
+          <label>Industry (optional)
+            <input type="text" name="industry" placeholder="Plumbing, dental, roofing..." />
+          </label>
+          <button type="submit">Run My Free Audit</button>
+          <p class="trust-line">Free • No signup • Results in 60 seconds</p>
         </form>
-        <p class="scan-trust">Free instant scan<span>•</span>No signup required<span>•</span>Results in 60 seconds</p>
-        <p class="scan-counter"><strong>12,847</strong> local businesses analyzed</p>
       </div>
     </section>
 
-    <!-- Live activity ticker: full-width, isolated from hero so its
-         animation is unaffected by any hero-height changes. -->
-    <div class="live-ticker" aria-hidden="true">
-      <div class="ticker-track">
-        <span class="ticker-item"><span class="ticker-dot"></span>Joe's Plumbing in Springfield scored B+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Lakeside Marina in Branson scored A-</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Main Street Bakery in Ozark scored C+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Hilltop Dental in Nixa scored B</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Branson Family Fun scored D+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Ozark Fishing Guides scored A</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Silver Dollar Gifts in Branson scored C</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Springfield Auto Repair scored B-</span>
-        <!-- duplicate for seamless loop -->
-        <span class="ticker-item"><span class="ticker-dot"></span>Joe's Plumbing in Springfield scored B+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Lakeside Marina in Branson scored A-</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Main Street Bakery in Ozark scored C+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Hilltop Dental in Nixa scored B</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Branson Family Fun scored D+</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Ozark Fishing Guides scored A</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Silver Dollar Gifts in Branson scored C</span>
-        <span class="ticker-item"><span class="ticker-dot"></span>Springfield Auto Repair scored B-</span>
-      </div>
-    </div>
-
-    <!-- ═══ HOW IT WORKS: One-line strip ═══ -->
     <section id="how" class="container">
-      <div class="how-strip">
-        <div class="how-step"><span class="step-num">1</span> Enter your business</div>
-        <span class="how-arrow">→</span>
-        <div class="how-step"><span class="step-num">2</span> We scan 40+ sources</div>
-        <span class="how-arrow">→</span>
-        <div class="how-step"><span class="step-num">3</span> Get your score + fix list</div>
+      <div class="how-section">
+        <div class="how-step"><span class="num">1</span> Enter your business</div>
+        <div class="how-step"><span class="num">2</span> We scan Google, Maps, directories & AI</div>
+        <div class="how-step"><span class="num">3</span> Get your score + what to fix</div>
       </div>
     </section>
 
-    <!-- ═══ WHAT WE CHECK ═══ -->
-    <section class="container section reveal">
-      <div class="features-row">
-        <article class="feature-card">
-          <div class="feature-icon">🔎</div>
-          <h3>Google Search</h3>
-          <p>Where you rank, who's above you, and the specific fix to pass them.</p>
+    <section class="container section">
+      <div class="value-cards">
+        <article class="value-card">
+          <div class="icon">🔎</div>
+          <h3>Google & Maps Presence</h3>
+          <p>See if customers can actually find you when they search for what you do.</p>
         </article>
-        <article class="feature-card">
-          <div class="feature-icon">📍</div>
-          <h3>Google Maps</h3>
-          <p>Your map pack position, review health, and what's keeping you out of the top 3.</p>
+        <article class="value-card">
+          <div class="icon">📂</div>
+          <h3>Directory & Citation Check</h3>
+          <p>Find out if your business info is correct across the sites that feed Google.</p>
         </article>
-        <article class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>AI Citations</h3>
-          <p>When someone asks ChatGPT "best near me" — we make sure the answer is you.</p>
+        <article class="value-card">
+          <div class="icon">🤖</div>
+          <h3>AI Search Visibility</h3>
+          <p>When someone asks ChatGPT or Google AI for a recommendation — will they mention you?</p>
+        </article>
+        <article class="value-card">
+          <div class="icon">🏆</div>
+          <h3>Competitor Comparison</h3>
+          <p>See how you stack up against the top 3 businesses in your area.</p>
         </article>
       </div>
     </section>
 
-    <!-- ═══ PROOF: Real data ═══ -->
-    <section id="proof" class="container section proof-section reveal">
-      <h2>Real scores from real businesses</h2>
-      <p class="proof-sub">We've audited 58+ businesses in Branson. Most are leaving money on the table.</p>
-      <div class="proof-cards">
-        <article class="proof-card">
-          <div class="grade bad">D+</div>
-          <h3>Entertainment</h3>
-          <p>Branson's core industry scores worst. Ticket sites outrank the actual venues.</p>
-        </article>
-        <article class="proof-card">
-          <div class="grade warn">C-</div>
-          <h3>Hotels &amp; Lodging</h3>
-          <p>10M visitors/year, but OTAs are eating their direct bookings.</p>
-        </article>
-        <article class="proof-card">
-          <div class="grade good">B</div>
-          <h3>Fishing Guides</h3>
-          <p>Owner-operators who invest in search score 22 points above entertainment.</p>
-        </article>
-      </div>
-      <p style="margin-top:1.25rem;"><a href="branson-report.html" style="color:var(--brand);font-weight:700;">Read the full Branson Market Report →</a></p>
-    </section>
-
-    <!-- ═══ FAQ ═══ -->
-    <section class="container section faq-section reveal">
+    <section id="faq" class="container section faq-section">
       <h2>Questions</h2>
-      <div class="faq-grid-new">
-        <details>
-          <summary>Is the audit really free?</summary>
-          <p>Yes. No signup, no credit card. You get real scores and a summary of what's wrong. Paid tiers unlock the full fix list with exact changes.</p>
-        </details>
-        <details>
-          <summary>I'm not technical. Will I understand it?</summary>
-          <p>That's the whole point. No dashboards or acronyms. Just plain-English fixes like "change your page title to this."</p>
-        </details>
-        <details>
-          <summary>What's AI citation?</summary>
-          <p>When someone asks ChatGPT "best plumber in Springfield" — it recommends specific businesses. We make sure it recommends yours.</p>
-        </details>
-        <details>
-          <summary>How is this different from an SEO agency?</summary>
-          <p>Agencies charge $800-$3,000/month. We give you a one-time fix list you can act on today. No retainer, no contract.</p>
-        </details>
-      </div>
+      <details>
+        <summary>Is the audit really free?</summary>
+        <p>Yes. No signup, no credit card. You get a real visibility score and plain-English findings immediately.</p>
+      </details>
+      <details>
+        <summary>I'm not technical. Will I understand the report?</summary>
+        <p>That's the whole point. No jargon, no dashboards. Just clear findings like "Customers can't find you on Google Maps because..." with specific fixes.</p>
+      </details>
+      <details>
+        <summary>What is AI search visibility?</summary>
+        <p>When someone asks ChatGPT or Google AI "best plumber near me" — it recommends specific businesses. We check if yours is one of them.</p>
+      </details>
+      <details>
+        <summary>How is this different from hiring an SEO agency?</summary>
+        <p>Agencies charge $800-$3,000/month and send reports you don't read. We give you a one-time, plain-English fix list you can act on today or hand to any web person.</p>
+      </details>
     </section>
 
-    <!-- ═══ FINAL CTA ═══ -->
-    <section class="container section final-cta reveal">
-      <h2>You didn't start a business to fight algorithms.</h2>
-      <p>Get back to what you're great at. We'll tell you exactly what to fix.</p>
-      <a class="btn btn-hot" href="#top" style="font-size:1.05rem;padding:1rem 2rem;">Scan My Business →</a>
+    <section class="container section final-cta">
+      <h2>Stop losing customers to competitors who show up first.</h2>
+      <p>Get your free visibility audit and find out exactly what to fix.</p>
+      <a class="btn btn-hot" href="#top" id="ctaScrollBtn" style="font-size:1.05rem;padding:1rem 2rem;">Run My Free Audit →</a>
     </section>
-
   </main>
 
   <footer class="site-footer container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <span class="brand-mark" aria-hidden="true">G</span>
-        <span><strong>GeoNeo AI</strong> &mdash; Search visibility for the AI era.</span>
-        <p class="footer-location">Based in Branson, MO &mdash; serving local businesses across the U.S.</p>
-      </div>
-      <div class="footer-links">
-        <strong>Audits</strong>
-        <a href="website-audit.html">Website Audit</a>
-        <a href="industry-audit.html">Industry Audit</a>
-        <a href="both-audit.html">Full Analysis</a>
-      </div>
-      <div class="footer-links">
-        <strong>Reports</strong>
-        <a href="branson-report.html">Branson Market Report</a>
-      </div>
-      <div class="footer-links">
-        <strong>Contact</strong>
-        <p>Branson, MO 65616</p>
-        <p><a href="mailto:hello@geoneo.ai">hello@geoneo.ai</a></p>
-      </div>
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true">G</span>
+      <span><strong>GeoNeo AI</strong> — AI visibility audits for local businesses.</span>
     </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 GeoNeo AI. All rights reserved.</p>
-      <a href="#top">Back to top &uarr;</a>
-    </div>
+    <p style="color:var(--muted);font-size:0.85rem;">&copy; 2026 GeoNeo AI. All rights reserved.</p>
   </footer>
 
   <script>
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-      a.addEventListener('click', function(e) {
-        var t = document.querySelector(this.getAttribute('href'));
-        if (!t) return;
-        e.preventDefault();
-        t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    // Rotating industry + location words in hero — cycles target verticals
-    // and the 417/Ozarks coverage area so the visitor sees their own trade
-    // and hometown within the first full rotation. Both the industry and
-    // the whole location phrase are rendered in brand green, each on
-    // their own centered line.
-    (function() {
-      var industryEl = document.getElementById('rotating-industry');
-      var locationEl = document.getElementById('rotating-location');
-      if (!industryEl || !locationEl) return;
-
-      var industries = [
-        'Plumber', 'Roofer', 'HVAC Company', 'Electrician',
-        'Pest Control Company', 'Tree Service', 'Garage Door Company',
-        'Restoration Company'
-      ];
-
-      // Full location phrases as they'd appear in a natural search query.
-      // Each includes the closing ?" so the punctuation always sits tight
-      // against the last letter of the location, regardless of length.
-      var locations = [
-        'in Springfield?"', 'in Nixa?"', 'in Ozark?"', 'in Branson?"',
-        'in Hollister?"', 'in Forsyth?"', 'in Branson West?"',
-        'in Reeds Spring?"', 'in Harrison?"', 'in the 417?"',
-        'in the Ozark Mountains?"', 'in Northwest Arkansas?"',
-        'in Taney County?"', 'in Boone County?"', 'in Greene County?"',
-        'in Christian County?"',
-        'near me?"', 'nearby?"', 'close to me?"'
-      ];
-
-      // Fisher-Yates shuffle a copy so every page load gets a different
-      // sequence.
-      function shuffled(arr) {
-        var copy = arr.slice();
-        for (var k = copy.length - 1; k > 0; k--) {
-          var j = Math.floor(Math.random() * (k + 1));
-          var tmp = copy[k]; copy[k] = copy[j]; copy[j] = tmp;
-        }
-        return copy;
-      }
-
-      var indOrder = shuffled(industries);
-      var locOrder = shuffled(locations);
-      var i = 0;
-
-      function swap() {
-        industryEl.classList.add('fade-out');
-        locationEl.classList.add('fade-out');
-
-        // Wait for fade-out to complete (matches CSS 0.55s transition),
-        // then swap contents and fade back in.
-        setTimeout(function() {
-          i = (i + 1) % Math.max(indOrder.length, locOrder.length);
-          industryEl.textContent = indOrder[i % indOrder.length];
-          locationEl.textContent = locOrder[i % locOrder.length];
-          industryEl.classList.remove('fade-out');
-          locationEl.classList.remove('fade-out');
-        }, 560);
-      }
-
-      setInterval(swap, 5200);
-    })();
-
-    // Reveal on scroll
-    document.documentElement.classList.add('js-enabled');
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); } });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
-
-    // Scan form → smart routing based on input type
-    document.getElementById('scanForm').addEventListener('submit', function(e) {
+    document.getElementById('auditForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      var val = this.querySelector('input').value.trim();
-      if (!val) return;
-      var encoded = encodeURIComponent(val);
-      var isUrl = /^(https?:\/\/|www\.)|(\.\w{2,})/.test(val);
-      if (isUrl) {
-        window.location.href = 'website-audit.html?url=' + encoded;
-      } else {
-        // Non-URL input (e.g. "babysitter springfield mo") goes to
-        // both-audit.html, which has the parser that splits the text into
-        // business/service + city + state + zip and auto-submits the form.
-        window.location.href = 'both-audit.html?url=' + encoded;
-      }
+      var fd = new FormData(this);
+      var url = (fd.get('url') || '').trim();
+      var city = (fd.get('city') || '').trim();
+      var state = (fd.get('state') || '').trim();
+      var industry = (fd.get('industry') || '').trim();
+      if (!url) return;
+      var params = new URLSearchParams();
+      params.set('url', url);
+      if (city) params.set('city', city);
+      if (state) params.set('state', state);
+      if (industry) params.set('industry', industry);
+      window.location.href = 'report.html?' + params.toString();
     });
-
-    // Final CTA scrolls to input and focuses it
-    document.querySelector('.final-cta .btn').addEventListener('click', function(e) {
+    document.getElementById('ctaScrollBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      var input = document.querySelector('#scanForm input');
+      var input = document.querySelector('#auditForm input[name="url"]');
       input.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(function() { input.focus(); }, 400);
     });

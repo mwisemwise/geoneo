@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Visibility Report | GeoNeo AI</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>G</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .report-wrap { max-width: 760px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+    .report-header { text-align: center; margin-bottom: 2.5rem; }
+    .report-header h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0 0 0.5rem; }
+    .report-header p { color: var(--muted); font-size: 0.95rem; }
+    .score-ring { width: 140px; height: 140px; margin: 1.5rem auto; position: relative; }
+    .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .score-ring circle { fill: none; stroke-width: 10; }
+    .score-ring .bg { stroke: var(--line); }
+    .score-ring .fg { stroke: var(--brand); stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+    .score-ring .score-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .score-ring .score-num { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 700; color: var(--ink); }
+    .score-ring .score-of { font-size: 0.8rem; color: var(--muted); }
+    .score-grade { text-align: center; font-size: 1rem; font-weight: 600; margin-bottom: 2rem; }
+    .score-grade.good { color: var(--brand); }
+    .score-grade.ok { color: #ffa657; }
+    .score-grade.bad { color: #ff6b6b; }
+    .report-section { margin-bottom: 2rem; }
+    .report-section h2 { font-size: 1.15rem; margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); }
+    .finding { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .finding:last-child { border-bottom: none; }
+    .finding-status { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; margin-right: 0.5rem; text-transform: uppercase; }
+    .finding-status.pass { background: rgba(0,229,160,0.12); color: var(--brand); }
+    .finding-status.fix { background: rgba(255,107,107,0.12); color: #ff6b6b; }
+    .finding-status.warn { background: rgba(255,166,87,0.12); color: #ffa657; }
+    .finding-text { font-size: 0.92rem; color: var(--ink); }
+    .finding-impact { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+    .fix-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.75rem; }
+    .fix-card .fix-num { font-size: 0.75rem; font-weight: 700; color: var(--brand); text-transform: uppercase; margin-bottom: 0.3rem; }
+    .fix-card .fix-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .fix-card .fix-desc { font-size: 0.88rem; color: var(--muted); }
+    .competitor-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .competitor-table th { text-align: left; padding: 0.6rem 0.5rem; border-bottom: 2px solid var(--line); color: var(--muted); font-size: 0.78rem; text-transform: uppercase; }
+    .competitor-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .competitor-table .strength-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--brand); min-width: 8px; }
+    .category-scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .cat-score { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem; text-align: center; }
+    .cat-score .cat-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; }
+    .cat-score .cat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+    .cta-box { text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 2rem; margin-top: 2.5rem; }
+    .cta-box h3 { margin: 0 0 0.5rem; }
+    .cta-box p { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+    .loading-state { text-align: center; padding: 4rem 1rem; }
+    .loading-state .spinner { width: 40px; height: 40px; border: 4px solid var(--line); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state p { color: var(--muted); }
+    .error-state { text-align: center; padding: 3rem 1rem; }
+    .error-state h2 { color: #ff6b6b; }
+    .error-state p { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="index.html" aria-label="GeoNeo AI home">
+      <span class="brand-mark" aria-hidden="true">G</span>
+      <span class="brand-text">GeoNeo AI</span>
+    </a>
+    <a class="btn btn-sm btn-ghost" href="index.html">← New Audit</a>
+  </header>
+
+  <main class="report-wrap" id="reportMain">
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p id="loadingMsg">Scanning your business visibility...</p>
+    </div>
+  </main>
+
+  <script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var urlInput = params.get('url') || '';
+    var city = params.get('city') || '';
+    var state = params.get('state') || '';
+    var industry = params.get('industry') || '';
+
+    if (!urlInput) {
+      showError('No business information provided.', 'Go back and enter your website or business name.');
+      return;
+    }
+
+    var isUrl = /^(https?:\/\/|www\.)|(\.\w{2,})/.test(urlInput);
+    var apiParams = new URLSearchParams();
+    apiParams.set('packageView', 'full_data');
+    apiParams.set('internalMode', 'true');
+
+    if (isUrl) {
+      apiParams.set('url', urlInput);
+      apiParams.set('queryType', 'website');
+    } else {
+      apiParams.set('queryType', 'market');
+      apiParams.set('businessName', urlInput);
+    }
+    if (city) apiParams.set('city', city);
+    if (state) apiParams.set('state', state);
+    if (industry) apiParams.set('industry', industry);
+
+    var msgs = [
+      'Checking Google Search rankings...',
+      'Scanning Google Maps presence...',
+      'Checking directory listings...',
+      'Analyzing AI search visibility...',
+      'Comparing against local competitors...',
+      'Building your report...'
+    ];
+    var msgIdx = 0;
+    var msgInterval = setInterval(function() {
+      msgIdx++;
+      if (msgIdx < msgs.length) {
+        document.getElementById('loadingMsg').textContent = msgs[msgIdx];
+      }
+    }, 8000);
+
+    fetch('/api/audit?' + apiParams.toString())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        clearInterval(msgInterval);
+        if (data.error) {
+          showError('Audit could not complete', data.fetchMessage || data.error);
+          return;
+        }
+        renderReport(data);
+      })
+      .catch(function(err) {
+        clearInterval(msgInterval);
+        showError('Something went wrong', 'Please try again in a moment.');
+      });
+
+    function showError(title, msg) {
+      document.getElementById('reportMain').innerHTML =
+        '<div class="error-state"><h2>' + esc(title) + '</h2><p>' + esc(msg) + '</p><a class="btn btn-hot" href="index.html" style="margin-top:1rem;display:inline-block;">Try Again</a></div>';
+    }
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+    function renderReport(data) {
+      var scores = data.summaryScores || {};
+      var overall = computeOverall(scores);
+      var grade = gradeFromScore(overall);
+      var issues = data.issues || [];
+      var fixes = data.fixes || [];
+      var competitors = data.competitors || [];
+      var searchPos = data.searchPositioning || {};
+      var input = data.input || {};
+      var businessLabel = input.website || input.businessName || urlInput;
+
+      var html = '';
+      html += '<div class="report-header">';
+      html += '<h1>Visibility Report</h1>';
+      html += '<p>' + esc(businessLabel) + (city ? ' — ' + esc(city) + (state ? ', ' + esc(state) : '') : '') + '</p>';
+      html += '</div>';
+
+      // Overall score ring
+      html += renderScoreRing(overall);
+      html += '<div class="score-grade ' + grade.cls + '">' + esc(grade.label) + '</div>';
+
+      // Category scores
+      html += '<div class="category-scores">';
+      html += catScore(scores.seo, 'Google SEO');
+      html += catScore(scores.localPresence, 'Local Presence');
+      html += catScore(scores.aiVisibility, 'AI Visibility');
+      html += catScore(scores.technical, 'Technical Health');
+      html += catScore(scores.reputation, 'Trust & Reviews');
+      html += catScore(scores.conversionUx, 'Website Quality');
+      html += '</div>';
+
+      // Findings section
+      html += '<div class="report-section">';
+      html += '<h2>What We Found</h2>';
+      html += renderFindings(scores, issues, searchPos);
+      html += '</div>';
+
+      // Top fixes
+      if (fixes.length) {
+        html += '<div class="report-section">';
+        html += '<h2>What to Fix First</h2>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These are the changes that will have the biggest impact on your visibility. Listed in priority order.</p>';
+        var topFixes = fixes.slice(0, 5);
+        for (var i = 0; i < topFixes.length; i++) {
+          html += renderFix(i + 1, topFixes[i]);
+        }
+        html += '</div>';
+      }
+
+      // Competitor comparison
+      if (competitors.length) {
+        html += '<div class="report-section">';
+        html += '<h2>How You Compare to Local Competitors</h2>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These businesses show up when customers search for your type of service in your area.</p>';
+        html += renderCompetitors(competitors.slice(0, 3), overall);
+        html += '</div>';
+      }
+
+      // CTA
+      html += '<div class="cta-box">';
+      html += '<h3>Want help fixing these issues?</h3>';
+      html += '<p>We can implement these fixes for you or guide your web team through them.</p>';
+      html += '<a class="btn btn-hot" href="mailto:hello@geoneo.ai?subject=Visibility%20Audit%20Follow-up&body=I%20just%20ran%20an%20audit%20for%20' + encodeURIComponent(businessLabel) + '%20and%20would%20like%20help.">Get Help With My Fixes</a>';
+      html += '</div>';
+
+      document.getElementById('reportMain').innerHTML = html;
+    }
+
+    function computeOverall(scores) {
+      var vals = [scores.seo, scores.localPresence, scores.aiVisibility, scores.technical, scores.reputation, scores.conversionUx].filter(function(v) { return typeof v === 'number'; });
+      if (!vals.length) return 0;
+      return Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
+    }
+
+    function gradeFromScore(s) {
+      if (s >= 80) return { label: 'Strong visibility — keep building on this foundation', cls: 'good' };
+      if (s >= 55) return { label: 'Moderate visibility — customers are finding competitors before you', cls: 'ok' };
+      return { label: 'Low visibility — you are likely invisible to most potential customers', cls: 'bad' };
+    }
+
+    function renderScoreRing(score) {
+      var circ = 2 * Math.PI * 60;
+      var offset = circ - (circ * score / 100);
+      var color = score >= 80 ? '#00e5a0' : (score >= 55 ? '#ffa657' : '#ff6b6b');
+      return '<div class="score-ring">' +
+        '<svg viewBox="0 0 140 140"><circle class="bg" cx="70" cy="70" r="60"/><circle class="fg" cx="70" cy="70" r="60" style="stroke:' + color + ';stroke-dasharray:' + circ.toFixed(1) + ';stroke-dashoffset:' + offset.toFixed(1) + '"/></svg>' +
+        '<div class="score-label"><span class="score-num">' + score + '</span><span class="score-of">out of 100</span></div></div>';
+    }
+
+    function catScore(val, label) {
+      var v = typeof val === 'number' ? val : 0;
+      var color = v >= 70 ? 'var(--brand)' : (v >= 45 ? '#ffa657' : '#ff6b6b');
+      return '<div class="cat-score"><div class="cat-val" style="color:' + color + '">' + v + '</div><div class="cat-label">' + esc(label) + '</div></div>';
+    }
+
+    function renderFindings(scores, issues, searchPos) {
+      var html = '';
+      // Google/Business presence
+      var googleOk = (scores.seo || 0) >= 65 && (scores.localPresence || 0) >= 60;
+      html += finding(googleOk ? 'pass' : 'fix',
+        googleOk
+          ? 'Your business shows up in Google Search for relevant queries.'
+          : 'Your business is hard to find in Google Search for what you do.',
+        googleOk
+          ? 'Customers searching for your services can find you, but there is room to rank higher.'
+          : 'When potential customers search for your type of service, they are finding your competitors instead of you.'
+      );
+
+      // Local/Maps presence
+      var localOk = (scores.localPresence || 0) >= 65;
+      html += finding(localOk ? 'pass' : 'fix',
+        localOk
+          ? 'Your local presence (Maps, directories) is reasonably strong.'
+          : 'Your business is not showing up well in Google Maps and local results.',
+        localOk
+          ? 'People searching "near me" have a decent chance of finding you.'
+          : 'When someone searches "near me" or in your city, competitors are showing up first. This means lost phone calls and lost jobs.'
+      );
+
+      // Directory/citation
+      var dirOk = (scores.reputation || 0) >= 60 && (scores.localPresence || 0) >= 55;
+      html += finding(dirOk ? 'pass' : 'warn',
+        dirOk
+          ? 'Your business information appears consistent across major directories.'
+          : 'Your directory and citation presence needs attention.',
+        dirOk
+          ? 'Consistent info across directories helps Google trust your business location.'
+          : 'Inconsistent or missing business info across directories makes it harder for Google to trust and show your business.'
+      );
+
+      // Technical SEO
+      var techOk = (scores.technical || 0) >= 70;
+      html += finding(techOk ? 'pass' : 'fix',
+        techOk
+          ? 'Your website technical foundation is solid.'
+          : 'Your website has technical issues that reduce your visibility.',
+        techOk
+          ? 'Search engines can read and understand your site without major problems.'
+          : 'Technical problems on your website make it harder for Google to understand and show your business to searchers.'
+      );
+
+      // AI discoverability
+      var aiOk = (scores.aiVisibility || 0) >= 60;
+      html += finding(aiOk ? 'pass' : 'fix',
+        aiOk
+          ? 'Your business information is structured for AI search systems.'
+          : 'AI search tools (ChatGPT, Google AI) are unlikely to recommend your business.',
+        aiOk
+          ? 'When people ask AI for recommendations in your area, you have a chance of being mentioned.'
+          : 'When customers ask AI "who is the best ' + esc(industry || 'service provider') + ' near me?" — your business is not set up to be the answer.'
+      );
+
+      return html;
+    }
+
+    function finding(status, text, impact) {
+      return '<div class="finding"><span class="finding-status ' + status + '">' + (status === 'pass' ? '✓ Good' : (status === 'warn' ? '⚠ Needs Work' : '✗ Problem')) + '</span><span class="finding-text">' + esc(text) + '</span><div class="finding-impact">' + esc(impact) + '</div></div>';
+    }
+
+    function renderFix(num, fix) {
+      var plain = translateFix(fix);
+      return '<div class="fix-card"><div class="fix-num">Fix #' + num + '</div><div class="fix-title">' + esc(plain.title) + '</div><div class="fix-desc">' + esc(plain.desc) + '</div></div>';
+    }
+
+    function translateFix(fix) {
+      var cat = (fix.category || '').toLowerCase();
+      var title = fix.title || '';
+      var desc = fix.description || '';
+
+      // Translate technical jargon into business impact
+      var translations = {
+        'structured data': { t: 'Help Google understand your business better', d: 'Your website is missing information that helps Google and AI systems know what you do, where you are, and why customers should choose you.' },
+        'schema': { t: 'Help Google understand your business better', d: 'Adding structured business information to your website makes it easier for search engines and AI to recommend you.' },
+        'canonical': { t: 'Fix a technical issue confusing search engines', d: 'A missing technical signal is causing search engines to be unsure which version of your page to show, reducing your visibility.' },
+        'robots': { t: 'Remove a barrier blocking search engines', d: 'A configuration issue may be preventing search engines from properly reading and showing your website.' },
+        'meta description': { t: 'Improve how your business appears in search results', d: 'The preview text shown in Google results is missing or too short, making searchers less likely to click on your listing.' },
+        'h1': { t: 'Clarify what your page is about', d: 'Your main page heading is missing or unclear, making it harder for both customers and search engines to understand what you offer.' },
+        'image alt': { t: 'Make your images work harder for you', d: 'Images on your site are missing descriptions, which means search engines can\'t use them to help people find you.' },
+        'sitemap': { t: 'Help search engines find all your pages', d: 'A sitemap tells Google about every page on your site. Without one, some of your pages may never appear in search results.' },
+        'local': { t: 'Strengthen your local presence signals', d: 'Your website doesn\'t clearly communicate where you are and what areas you serve, making it harder to show up in local searches.' },
+        'thin content': { t: 'Add more useful information to your website', d: 'Your website doesn\'t have enough content for Google to consider it a helpful resource. More detail about your services builds trust with both customers and search engines.' },
+        'trust': { t: 'Build more credibility on your website', d: 'Your site is missing trust signals like reviews, credentials, and clear contact info that make visitors confident enough to call.' },
+        'faq': { t: 'Answer the questions customers are asking', d: 'Adding a FAQ section helps you show up when people search with questions, and makes AI tools more likely to recommend you.' },
+        'grammar': { t: 'Fix writing issues that hurt credibility', d: 'Spelling and grammar errors make your business look less professional and can reduce trust with potential customers.' }
+      };
+
+      var combined = (title + ' ' + desc).toLowerCase();
+      for (var key in translations) {
+        if (combined.indexOf(key) !== -1) {
+          return { title: translations[key].t, desc: translations[key].d };
+        }
+      }
+
+      // Fallback: use the fix as-is but clean up jargon
+      return {
+        title: title || 'Improve your online visibility',
+        desc: desc || 'Addressing this issue will help more customers find your business online.'
+      };
+    }
+
+    function renderCompetitors(comps, yourScore) {
+      var html = '<table class="competitor-table"><thead><tr><th>Business</th><th>Visibility</th><th>Where They Beat You</th></tr></thead><tbody>';
+      for (var i = 0; i < comps.length; i++) {
+        var c = comps[i];
+        var strength = c.strengthScore || c.scoreSummary && c.scoreSummary.seo || 50;
+        var barW = Math.max(10, Math.min(100, strength));
+        var advantage = getAdvantage(c, yourScore);
+        html += '<tr><td><strong>' + esc(c.companyName || c.name || c.domain || 'Competitor ' + (i+1)) + '</strong></td>';
+        html += '<td><span class="strength-bar" style="width:' + barW + 'px"></span> ' + strength + '/100</td>';
+        html += '<td style="font-size:0.82rem;color:var(--muted)">' + esc(advantage) + '</td></tr>';
+      }
+      html += '</tbody></table>';
+      html += '<p style="font-size:0.82rem;color:var(--muted);margin-top:0.75rem;">These competitors are capturing customers that could be yours. The fixes above will help you close the gap.</p>';
+      return html;
+    }
+
+    function getAdvantage(comp, yourScore) {
+      var dominated = [];
+      if ((comp.searchAppearances || 0) > 1) dominated.push('shows up more often in search');
+      if ((comp.mapPackAppearances || 0) > 0) dominated.push('appears in Google Maps');
+      if ((comp.hasStructuredData)) dominated.push('better set up for AI search');
+      if ((comp.reputationScore || 0) > 70) dominated.push('stronger review presence');
+      if ((comp.strengthScore || 0) > yourScore + 10) dominated.push('higher overall visibility');
+      if (!dominated.length) dominated.push('similar visibility level');
+      return dominated.slice(0, 2).join(', ');
+    }
+  })();
+  </script>
+</body>
+</html>

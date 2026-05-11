@@ -2,5 +2,11 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /website-audit.html
+Disallow: /industry-audit.html
+Disallow: /both-audit.html
+Disallow: /neo-club.html
+Disallow: /pitch-deck.html
+Disallow: /ozarks/
 
 Sitemap: https://geoneo.ai/sitemap.xml
