@@ -85,7 +85,7 @@
     var state = params.get('state') || '';
     var industry = params.get('industry') || '';
 
-    if (!urlInput) {
+    if (!urlInput && !industry && !city) {
       showError('No business information provided.', 'Go back and enter your website or business name.');
       return;
     }
@@ -100,12 +100,13 @@
       apiParams.set('queryType', 'website');
     } else {
       apiParams.set('queryType', 'market');
-      apiParams.set('businessName', urlInput);
-      if (!industry) apiParams.set('industry', urlInput);
+      if (urlInput) apiParams.set('businessName', urlInput);
+      // Use urlInput as industry if no explicit industry provided
+      var effectiveIndustry = industry || urlInput || '';
+      if (effectiveIndustry) apiParams.set('industry', effectiveIndustry);
     }
     if (city) apiParams.set('city', city);
     if (state) apiParams.set('state', state);
-    if (industry) apiParams.set('industry', industry);
 
     var msgs = [
       'Checking Google Search rankings...',
