@@ -160,13 +160,49 @@ function hasDataForSeoCredentials(config = {}) {
   return Boolean((config.login || process.env.SERP_API_LOGIN) && (config.apiKey || process.env.SERP_API_KEY));
 }
 
+const STATE_ABBREVS = { al:'alabama',ak:'alaska',az:'arizona',ar:'arkansas',ca:'california',co:'colorado',ct:'connecticut',de:'delaware',fl:'florida',ga:'georgia',hi:'hawaii',id:'idaho',il:'illinois',in:'indiana',ia:'iowa',ks:'kansas',ky:'kentucky',la:'louisiana',me:'maine',md:'maryland',ma:'massachusetts',mi:'michigan',mn:'minnesota',ms:'mississippi',mo:'missouri',mt:'montana',ne:'nebraska',nv:'nevada',nh:'new hampshire',nj:'new jersey',nm:'new mexico',ny:'new york',nc:'north carolina',nd:'north dakota',oh:'ohio',ok:'oklahoma',or:'oregon',pa:'pennsylvania',ri:'rhode island',sc:'south carolina',sd:'south dakota',tn:'tennessee',tx:'texas',ut:'utah',vt:'vermont',va:'virginia',wa:'washington',wv:'west virginia',wi:'wisconsin',wy:'wyoming',dc:'district of columbia' };
+function stateToFull(abbrev) { return STATE_ABBREVS[(abbrev||'').toLowerCase().trim()] || abbrev; }
+
 class SerpApiProvider {
   constructor(config) {
     this.config = config || {};
+    this._locationCache = new Map();
   }
 
   get name() {
     return 'serpapi';
+  }
+
+  async canonicalizeLocation(location) {
+    if (!location || location === 'United States') return location;
+    const cacheKey = normalizeText(location).toLowerCase();
+    if (this._locationCache.has(cacheKey)) return this._locationCache.get(cacheKey);
+    try {
+      // Extract just the city part for the lookup (SerpAPI matches on city name)
+      const cleaned = location.replace(/,\s*United States$/i, '').trim();
+      const cityPart = cleaned.split(',')[0].trim();
+      const endpoint = new URL('https://serpapi.com/locations.json');
+      endpoint.searchParams.set('q', cityPart);
+      endpoint.searchParams.set('limit', '3');
+      const res = await fetch(endpoint.toString());
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          // Try to match state if provided
+          const statePart = (cleaned.split(',')[1] || '').trim().toLowerCase();
+          const match = data.find(d => {
+            const cn = (d.canonical_name || '').toLowerCase();
+            return statePart ? cn.includes(cityPart.toLowerCase()) && (cn.includes(statePart) || cn.includes(stateToFull(statePart))) : true;
+          }) || data[0];
+          if (match && match.canonical_name) {
+            this._locationCache.set(cacheKey, match.canonical_name);
+            return match.canonical_name;
+          }
+        }
+      }
+    } catch { /* fall through */ }
+    this._locationCache.set(cacheKey, location);
+    return location;
   }
 
   async getSearchResults(query, location, options = {}) {
@@ -174,10 +210,11 @@ class SerpApiProvider {
     if (!apiKey) {
       throw new Error('SERP_API_KEY is required for SerpApi provider.');
     }
+    const canonicalLocation = await this.canonicalizeLocation(location);
     const endpoint = new URL(this.config.endpoint || 'https://serpapi.com/search.json');
     endpoint.searchParams.set('engine', 'google');
     endpoint.searchParams.set('q', query);
-    endpoint.searchParams.set('location', location || 'United States');
+    endpoint.searchParams.set('location', canonicalLocation || 'United States');
     endpoint.searchParams.set('hl', this.config.hl || 'en');
     endpoint.searchParams.set('gl', this.config.gl || 'us');
     endpoint.searchParams.set('num', String(options.num || 10));
@@ -191,7 +228,8 @@ class SerpApiProvider {
       options.timeoutMs || this.config.timeoutMs || DEFAULT_TIMEOUT_MS
     );
     if (!response.ok) {
-      throw new Error(`SerpApi request failed with status ${response.status}`);
+      const body = await response.text().catch(() => '');
+      throw new Error(`SerpApi request failed with status ${response.status}: ${body.slice(0, 200)}`);
     }
     return response.json();
   }
