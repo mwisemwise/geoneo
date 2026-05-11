@@ -1149,7 +1149,7 @@ function generateLocalBuyerQueries(industry, area) {
       return true;
     })
     .filter((query, index, list) => list.findIndex((item) => item.toLowerCase() === query.toLowerCase()) === index)
-    .slice(0, 8);
+    .slice(0, 3);
 }
 
 function unwrapSearchRedirectUrl(url) {

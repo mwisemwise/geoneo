@@ -101,6 +101,7 @@
     } else {
       apiParams.set('queryType', 'market');
       apiParams.set('businessName', urlInput);
+      if (!industry) apiParams.set('industry', urlInput);
     }
     if (city) apiParams.set('city', city);
     if (state) apiParams.set('state', state);
@@ -122,7 +123,7 @@
       }
     }, 8000);
 
-    fetch('/api/audit?' + apiParams.toString())
+    fetch('/api/audit?' + apiParams.toString(), { signal: AbortSignal.timeout(60000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         clearInterval(msgInterval);
