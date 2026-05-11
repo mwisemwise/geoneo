@@ -202,6 +202,9 @@
         html += '</div>';
       }
 
+      // Deep audit placeholder (loads async)
+      html += '<div id="deepAuditSection"></div>';
+
       // CTA
       html += '<div class="cta-box">';
       html += '<h3>Want help fixing these issues?</h3>';
@@ -210,6 +213,47 @@
       html += '</div>';
 
       document.getElementById('reportMain').innerHTML = html;
+
+      // Async: run deep audit for dollar estimates
+      if (isUrl) {
+        var deepParams = new URLSearchParams();
+        deepParams.set('url', urlInput);
+        if (city) deepParams.set('city', city);
+        if (state) deepParams.set('state', state);
+        if (industry) deepParams.set('industry', industry);
+        fetch('/api/audit-deep?' + deepParams.toString())
+          .then(function(r) { return r.json(); })
+          .then(function(deep) {
+            if (!deep.ok || !deep.dollarOpportunity) return;
+            var sec = document.getElementById('deepAuditSection');
+            if (!sec) return;
+            var dhtml = '';
+            var opp = deep.dollarOpportunity;
+            if (opp.monthly.high > 0) {
+              dhtml += '<div class="report-section" style="background:rgba(255,166,87,0.06);border:1px solid rgba(255,166,87,0.2);border-radius:14px;padding:1.5rem;margin-bottom:2rem;">';
+              dhtml += '<h2 style="color:#ffa657;border:none;padding:0;margin-bottom:0.5rem;">💰 Estimated Revenue You\'re Missing</h2>';
+              dhtml += '<p style="font-size:1.3rem;font-weight:700;margin:0 0 0.3rem;">$' + opp.monthly.low + ' – $' + opp.monthly.high + ' per month</p>';
+              dhtml += '<p style="color:var(--muted);font-size:0.88rem;margin:0;">That\'s approximately $' + opp.annual.low.toLocaleString() + ' – $' + opp.annual.high.toLocaleString() + ' per year in leads going to competitors instead of you.</p>';
+              dhtml += '</div>';
+            }
+            // Deep findings
+            var findings = deep.topFiveFindings || [];
+            if (findings.length) {
+              dhtml += '<div class="report-section">';
+              dhtml += '<h2>Detailed Technical Findings</h2>';
+              findings.forEach(function(f) {
+                var sev = f.severity === 'high' ? 'fix' : (f.severity === 'medium' ? 'warn' : 'pass');
+                var dollarNote = f.dollarImpact && f.dollarImpact.monthly.high > 0 ? ' (~$' + f.dollarImpact.monthly.low + '-$' + f.dollarImpact.monthly.high + '/mo impact)' : '';
+                dhtml += '<div class="finding"><span class="finding-status ' + sev + '">' + (sev === 'fix' ? '✗ Fix' : (sev === 'warn' ? '⚠ Improve' : '✓ OK')) + '</span>';
+                dhtml += '<span class="finding-text">' + esc(f.title || '') + '</span>';
+                dhtml += '<div class="finding-impact">' + esc(f.detail || '') + dollarNote + '</div></div>';
+              });
+              dhtml += '</div>';
+            }
+            sec.innerHTML = dhtml;
+          })
+          .catch(function() { /* silent fail for deep audit */ });
+      }
     }
 
     function computeOverall(scores) {

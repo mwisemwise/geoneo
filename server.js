@@ -5742,6 +5742,32 @@ async function requestHandler(req, res) {
     return;
   }
 
+  if (reqUrl.pathname === '/api/audit-deep' && req.method === 'GET') {
+    const { runDeepAudit } = require('./services/auditDeep');
+    try {
+      const targetUrl = reqUrl.searchParams.get('url') || '';
+      const industry = reqUrl.searchParams.get('industry') || '';
+      const city = reqUrl.searchParams.get('city') || '';
+      const state = reqUrl.searchParams.get('state') || '';
+      if (!targetUrl) { sendJson(res, 400, { error: 'Missing url parameter.' }); return; }
+      const parsed = safeUrl(targetUrl);
+      const [pageRes, sitemapRes, robotsRes] = await Promise.all([
+        fetch(parsed.toString(), { redirect: 'follow', headers: { 'User-Agent': 'GeoNeo-DeepAudit/1.0' } }).catch(() => null),
+        fetch(`${parsed.origin}/sitemap.xml`, { redirect: 'follow' }).catch(() => null),
+        fetch(`${parsed.origin}/robots.txt`, { redirect: 'follow' }).catch(() => null)
+      ]);
+      if (!pageRes || !pageRes.ok) { sendJson(res, 502, { error: 'Could not fetch the website.' }); return; }
+      const html = await pageRes.text();
+      const sitemapXml = sitemapRes && sitemapRes.ok ? await sitemapRes.text() : null;
+      const robotsTxt = robotsRes && robotsRes.ok ? await robotsRes.text() : '';
+      const result = await runDeepAudit({ html, finalUrl: pageRes.url, robotsTxt, sitemapXml, industry, city, state, businessFacts: { businessName: reqUrl.searchParams.get('businessName') || '' } });
+      sendJson(res, 200, { ok: true, ...result });
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Deep audit failed.' });
+    }
+    return;
+  }
+
   if (reqUrl.pathname === '/api/audit' && req.method === 'GET') {
     try {
       const queryType = normalizeQueryType(reqUrl.searchParams.get('queryType') || 'website');
