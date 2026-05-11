@@ -146,14 +146,41 @@
 
     function renderReport(data) {
       var scores = data.summaryScores || {};
-      var overall = computeOverall(scores);
-      var grade = gradeFromScore(overall);
+      var mode = data.mode || data.queryType || 'website';
       var issues = data.issues || [];
       var fixes = data.fixes || [];
       var competitors = data.competitors || [];
       var searchPos = data.searchPositioning || {};
       var input = data.input || {};
-      var businessLabel = input.website || input.businessName || urlInput;
+      var businessLabel = input.website || input.businessName || input.industry || urlInput;
+
+      // For market mode, scores have different keys — normalize
+      var displayScores;
+      if (mode === 'market') {
+        displayScores = {
+          seo: scores.competitionLevel || 0,
+          localPresence: scores.localBusinessVisibility || 0,
+          aiVisibility: scores.opportunityScore || 0,
+          technical: scores.marketActivity || 0,
+          reputation: scores.leadPotential || 0,
+          conversionUx: scores.directoryDominance || 0
+        };
+      } else {
+        displayScores = {
+          seo: scores.seo || 0,
+          localPresence: scores.localPresence || 0,
+          aiVisibility: scores.aiVisibility || 0,
+          technical: scores.technical || 0,
+          reputation: scores.reputation || 0,
+          conversionUx: scores.conversionUx || 0
+        };
+      }
+
+      var overall = computeOverall(displayScores);
+      var grade = gradeFromScore(overall);
+
+      // Detect if we have no real data (all zeros = no SERP provider)
+      var hasNoData = overall === 0 && competitors.length === 0 && fixes.length === 0;
 
       var html = '';
       html += '<div class="report-header">';
@@ -161,24 +188,49 @@
       html += '<p>' + esc(businessLabel) + (city ? ' — ' + esc(city) + (state ? ', ' + esc(state) : '') : '') + '</p>';
       html += '</div>';
 
+      if (hasNoData && mode === 'market') {
+        // No data scenario — show helpful message instead of zeros
+        html += '<div style="text-align:center;padding:2rem;border:1px solid var(--line);border-radius:16px;margin-bottom:2rem;">';
+        html += '<p style="font-size:1.3rem;margin:0 0 0.75rem;">⚠️ Limited data available</p>';
+        html += '<p style="color:var(--muted);max-width:500px;margin:0 auto 1rem;">We couldn\'t find enough search data for <strong>' + esc(businessLabel) + '</strong> in <strong>' + esc(city || 'your area') + '</strong>. This usually means:</p>';
+        html += '<ul style="text-align:left;max-width:400px;margin:0 auto;color:var(--muted);font-size:0.9rem;">';
+        html += '<li>Your business doesn\'t have a website yet (enter a URL for a full audit)</li>';
+        html += '<li>The business name wasn\'t found in search results</li>';
+        html += '<li>Try entering your actual website URL for the most accurate results</li>';
+        html += '</ul>';
+        html += '</div>';
+        html += '<div class="cta-box"><h3>Try again with your website URL</h3><p>For the most accurate audit, enter your actual website address (e.g., www.yourbusiness.com)</p><a class="btn btn-hot" href="index.html">Run Another Audit</a></div>';
+        document.getElementById('reportMain').innerHTML = html;
+        return;
+      }
+
       // Overall score ring
       html += renderScoreRing(overall);
       html += '<div class="score-grade ' + grade.cls + '">' + esc(grade.label) + '</div>';
 
       // Category scores
       html += '<div class="category-scores">';
-      html += catScore(scores.seo, 'Google SEO');
-      html += catScore(scores.localPresence, 'Local Presence');
-      html += catScore(scores.aiVisibility, 'AI Visibility');
-      html += catScore(scores.technical, 'Technical Health');
-      html += catScore(scores.reputation, 'Trust & Reviews');
-      html += catScore(scores.conversionUx, 'Website Quality');
+      if (mode === 'market') {
+        html += catScore(displayScores.seo, 'Competition');
+        html += catScore(displayScores.localPresence, 'Local Visibility');
+        html += catScore(displayScores.aiVisibility, 'Opportunity');
+        html += catScore(displayScores.technical, 'Market Activity');
+        html += catScore(displayScores.reputation, 'Lead Potential');
+        html += catScore(displayScores.conversionUx, 'Directory Presence');
+      } else {
+        html += catScore(displayScores.seo, 'Google SEO');
+        html += catScore(displayScores.localPresence, 'Local Presence');
+        html += catScore(displayScores.aiVisibility, 'AI Visibility');
+        html += catScore(displayScores.technical, 'Technical Health');
+        html += catScore(displayScores.reputation, 'Trust & Reviews');
+        html += catScore(displayScores.conversionUx, 'Website Quality');
+      }
       html += '</div>';
 
       // Findings section
       html += '<div class="report-section">';
       html += '<h2>What We Found</h2>';
-      html += renderFindings(scores, issues, searchPos);
+      html += renderFindings(displayScores, issues, searchPos);
       html += '</div>';
 
       // Top fixes
@@ -199,6 +251,19 @@
         html += '<h2>How You Compare to Local Competitors</h2>';
         html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These businesses show up when customers search for your type of service in your area.</p>';
         html += renderCompetitors(competitors.slice(0, 3), overall);
+        html += '</div>';
+      }
+
+      // If market mode has issues from the API, show them as findings too
+      if (mode === 'market' && issues.length > 1) {
+        html += '<div class="report-section">';
+        html += '<h2>Market Intelligence</h2>';
+        issues.forEach(function(iss) {
+          var sev = iss.severity === 'high' ? 'fix' : (iss.severity === 'medium' ? 'warn' : 'pass');
+          html += '<div class="finding"><span class="finding-status ' + sev + '">' + (sev === 'fix' ? '✗' : (sev === 'warn' ? '⚠' : '✓')) + '</span>';
+          html += '<span class="finding-text">' + esc(iss.title || '') + '</span>';
+          html += '<div class="finding-impact">' + esc(iss.description || '') + '</div></div>';
+        });
         html += '</div>';
       }
 
