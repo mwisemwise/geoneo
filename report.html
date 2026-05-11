@@ -84,10 +84,11 @@
     var city = params.get('city') || '';
     var state = params.get('state') || '';
     var industry = params.get('industry') || '';
+    var inputMode = params.get('mode') || ''; // 'website' or 'industry'
 
-    // Parse natural language input like "branson mo tow" or "tow companies branson mo"
+    // Parse natural language input like "branson mo tow" into city/state/industry
     if (urlInput && !city && !/^(https?:\/\/|www\.)|(\.\w{2,})/.test(urlInput)) {
-      var parsed = parseNaturalInput(urlInput, city, state, industry);
+      var parsed = parseNaturalInput(urlInput);
       city = parsed.city || city;
       state = parsed.state || state;
       industry = parsed.industry || industry;
@@ -104,18 +105,18 @@
     apiParams.set('packageView', 'full_data');
     apiParams.set('internalMode', 'true');
 
-    if (isUrl) {
-      apiParams.set('url', urlInput);
-      apiParams.set('queryType', 'website');
-    } else {
+    if (inputMode === 'industry' || (!isUrl && inputMode !== 'website')) {
       apiParams.set('queryType', 'market');
-      if (urlInput) apiParams.set('businessName', urlInput);
-      // Use urlInput as industry if no explicit industry provided
+      if (urlInput && !isUrl) apiParams.set('businessName', urlInput);
       var effectiveIndustry = industry || urlInput || '';
       if (effectiveIndustry) apiParams.set('industry', effectiveIndustry);
+    } else {
+      apiParams.set('url', urlInput);
+      apiParams.set('queryType', 'website');
     }
     if (city) apiParams.set('city', city);
     if (state) apiParams.set('state', state);
+    if (industry) apiParams.set('industry', industry);
 
     var msgs = [
       'Checking Google Search rankings...',
@@ -359,6 +360,18 @@
       }
       html += '<a class="btn btn-hot" href="mailto:hello@geoneo.ai?subject=' + encodeURIComponent((mode === 'market' ? 'Market Report: ' : 'Visibility Audit: ') + businessLabel) + '&body=I%20just%20ran%20a%20report%20and%20would%20like%20help.">Get Started</a>';
       html += '</div>';
+
+      // On website audits, show button to also run industry report
+      if (mode !== 'market' && (industry || city)) {
+        var indParams = new URLSearchParams();
+        indParams.set('mode', 'industry');
+        if (industry) indParams.set('industry', industry);
+        if (city) indParams.set('city', city);
+        if (state) indParams.set('state', state);
+        html += '<div style="text-align:center;margin-top:1.5rem;">';
+        html += '<a href="report.html?' + indParams.toString() + '" style="color:var(--brand);font-weight:600;font-size:0.9rem;">📊 Also see: Industry Market Report for ' + esc(industry || 'your industry') + ' in ' + esc(city || 'your area') + ' →</a>';
+        html += '</div>';
+      }
 
       document.getElementById('reportMain').innerHTML = html;
 

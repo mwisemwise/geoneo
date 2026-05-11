@@ -79,9 +79,14 @@
       </div>
 
       <div class="audit-box">
-        <form id="auditForm">
-          <label>Business website OR industry
-            <input type="text" name="url" placeholder="www.example.com or 'towing', 'shows', 'plumbing'..." autocomplete="off" />
+        <div class="mode-tabs" style="display:flex;gap:0;margin-bottom:1rem;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;">
+          <button type="button" id="tabWebsite" class="mode-tab active" style="flex:1;padding:0.7rem;border:none;background:var(--brand);color:#0a0f1a;font-weight:700;font-size:0.9rem;cursor:pointer;font-family:inherit;">Website Audit</button>
+          <button type="button" id="tabIndustry" class="mode-tab" style="flex:1;padding:0.7rem;border:none;background:var(--surface);color:var(--muted);font-weight:600;font-size:0.9rem;cursor:pointer;font-family:inherit;">Industry Audit</button>
+        </div>
+
+        <form id="websiteForm" style="display:flex;flex-direction:column;gap:0.75rem;">
+          <label>Website URL
+            <input type="text" name="url" placeholder="www.yourbusiness.com" required autocomplete="off" />
           </label>
           <div class="row">
             <label>City
@@ -91,11 +96,27 @@
               <input type="text" name="state" placeholder="MO" maxlength="2" />
             </label>
           </div>
-          <label>Industry (if not entered above)
+          <label>Industry (optional)
             <input type="text" name="industry" placeholder="Plumbing, dental, roofing..." />
           </label>
-          <button type="submit">Run My Free Audit</button>
+          <button type="submit">Audit My Website</button>
           <p class="trust-line">Free • No signup • Results in 60 seconds</p>
+        </form>
+
+        <form id="industryForm" style="display:none;flex-direction:column;gap:0.75rem;">
+          <label>Industry / Service
+            <input type="text" name="industry" placeholder="Towing, shows, plumbing, HVAC..." required autocomplete="off" />
+          </label>
+          <div class="row">
+            <label>City
+              <input type="text" name="city" placeholder="Branson" required />
+            </label>
+            <label>State
+              <input type="text" name="state" placeholder="MO" maxlength="2" />
+            </label>
+          </div>
+          <button type="submit">Audit This Market</button>
+          <p class="trust-line">Free • No signup • See who dominates this market</p>
         </form>
       </div>
     </section>
@@ -169,30 +190,50 @@
   </footer>
 
   <script>
-    document.getElementById('auditForm').addEventListener('submit', function(e) {
+    // Tab switching
+    var tabW = document.getElementById('tabWebsite');
+    var tabI = document.getElementById('tabIndustry');
+    var formW = document.getElementById('websiteForm');
+    var formI = document.getElementById('industryForm');
+    tabW.addEventListener('click', function() {
+      tabW.style.background='var(--brand)'; tabW.style.color='#0a0f1a';
+      tabI.style.background='var(--surface)'; tabI.style.color='var(--muted)';
+      formW.style.display='flex'; formI.style.display='none';
+    });
+    tabI.addEventListener('click', function() {
+      tabI.style.background='var(--brand)'; tabI.style.color='#0a0f1a';
+      tabW.style.background='var(--surface)'; tabW.style.color='var(--muted)';
+      formI.style.display='flex'; formW.style.display='none';
+    });
+
+    // Website audit submit
+    formW.addEventListener('submit', function(e) {
       e.preventDefault();
       var fd = new FormData(this);
-      var url = (fd.get('url') || '').trim();
-      var city = (fd.get('city') || '').trim();
-      var state = (fd.get('state') || '').trim();
-      var industry = (fd.get('industry') || '').trim();
-      // Allow: URL in first field, OR industry in first field, OR industry in industry field
-      var input = url || industry;
-      if (!input && !city) { alert('Enter a website, industry, or city to get started.'); return; }
       var params = new URLSearchParams();
-      if (url) params.set('url', url);
-      if (city) params.set('city', city);
-      if (state) params.set('state', state);
-      if (industry) params.set('industry', industry);
-      // If no URL field but have industry, use industry as the main input
-      if (!url && industry) params.set('url', industry);
-      // If have city but nothing else, use city as context
-      if (!url && !industry && city) params.set('url', city);
+      params.set('mode', 'website');
+      params.set('url', fd.get('url').trim());
+      if (fd.get('city').trim()) params.set('city', fd.get('city').trim());
+      if (fd.get('state').trim()) params.set('state', fd.get('state').trim());
+      if (fd.get('industry').trim()) params.set('industry', fd.get('industry').trim());
       window.location.href = 'report.html?' + params.toString();
     });
+
+    // Industry audit submit
+    formI.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var fd = new FormData(this);
+      var params = new URLSearchParams();
+      params.set('mode', 'industry');
+      params.set('industry', fd.get('industry').trim());
+      params.set('city', fd.get('city').trim());
+      if (fd.get('state').trim()) params.set('state', fd.get('state').trim());
+      window.location.href = 'report.html?' + params.toString();
+    });
+
     document.getElementById('ctaScrollBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      var input = document.querySelector('#auditForm input[name="url"]');
+      var input = formW.querySelector('input');
       input.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(function() { input.focus(); }, 400);
     });
