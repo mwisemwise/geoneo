@@ -5976,6 +5976,51 @@ async function requestHandler(req, res) {
     return;
   }
 
+  if (reqUrl.pathname === '/api/admin/prospect' && req.method === 'GET') {
+    if (!isLocalRequest(req)) { res.writeHead(403); res.end('Forbidden'); return; }
+    try {
+      const industry = normalizeString(reqUrl.searchParams.get('industry') || '');
+      const city = normalizeString(reqUrl.searchParams.get('city') || '');
+      const state = normalizeString(reqUrl.searchParams.get('state') || '');
+      if (!industry || !city) { sendJson(res, 400, { error: 'industry and city are required.' }); return; }
+
+      // 1. Discover competitors via market audit
+      const marketResult = await runMarketOnlyAudit({ industry, city, state });
+      const found = (marketResult.competitors || []).filter(c => c.domain && c.website);
+
+      // 2. Run quick audits on top businesses (limit to 8 for speed)
+      const { runDeepAudit } = require('./services/auditDeep');
+      const { estimateSpecificLoss } = require('./services/dollarLiftEngine');
+      const targets = found.slice(0, 8);
+      const prospects = await Promise.all(targets.map(async (comp) => {
+        try {
+          const pageRes = await fetch(comp.website, { redirect: 'follow', headers: { 'User-Agent': 'GeoNeo-ProspectBot/1.0' }, signal: AbortSignal.timeout(10000) }).catch(() => null);
+          if (!pageRes || !pageRes.ok) return null;
+          const html = await pageRes.text();
+          const deepResult = await runDeepAudit({ html, finalUrl: pageRes.url, industry, city, state, businessFacts: { businessName: comp.companyName } });
+          const loss = estimateSpecificLoss({ industry, city, missingFromQueries: marketResult.summaryScores.competitionLevel > 50 ? 5 : 3, totalQueriesTested: 8, currentAvgPosition: comp.averagePosition || 12 });
+          const topIssues = (deepResult.topFiveFindings || []).slice(0, 4).map(f => f.title);
+          return {
+            name: comp.companyName,
+            website: comp.website,
+            domain: comp.domain,
+            score: deepResult.overallScore,
+            topIssues,
+            revenueLost: loss.monthlyDollarLoss,
+            competitorsAbove: Math.min(comp.averagePosition - 1, targets.length - 1) + ' businesses',
+            rank: comp.averagePosition
+          };
+        } catch { return null; }
+      }));
+
+      const validProspects = prospects.filter(Boolean).sort((a, b) => a.score - b.score);
+      sendJson(res, 200, { ok: true, prospects: validProspects, context: { industry, city, state, totalFound: found.length } });
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Prospect discovery failed.' });
+    }
+    return;
+  }
+
   serveStatic(req, res);
 }
 

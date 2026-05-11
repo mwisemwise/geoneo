@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prospect Hunter | GeoNeo Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>G</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+    .admin-header { margin-bottom: 2rem; }
+    .admin-header h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
+    .admin-header p { color: var(--muted); margin: 0; }
+    .prospect-form { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 2rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .prospect-form label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; color: var(--muted); }
+    .prospect-form input { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; font-family: inherit; outline: none; width: 160px; }
+    .prospect-form input:focus { border-color: var(--brand); }
+    .prospect-form button { border: none; background: var(--brand); color: #0a0f1a; font-weight: 700; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.9rem; white-space: nowrap; }
+    .status-bar { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.88rem; display: none; }
+    .status-bar.active { display: block; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); color: var(--brand); }
+    .status-bar.error { display: block; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: #ff6b6b; }
+    .results-grid { display: grid; gap: 1rem; }
+    .prospect-card { border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem; background: var(--surface); }
+    .prospect-card .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .prospect-card h3 { margin: 0; font-size: 1rem; }
+    .prospect-card .domain { color: var(--muted); font-size: 0.82rem; }
+    .prospect-card .score-badge { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 700; min-width: 50px; text-align: center; }
+    .prospect-card .score-badge.good { color: var(--brand); }
+    .prospect-card .score-badge.ok { color: #ffa657; }
+    .prospect-card .score-badge.bad { color: #ff6b6b; }
+    .prospect-card .issues { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .prospect-card .revenue-lost { font-size: 0.88rem; font-weight: 600; color: #ffa657; margin-bottom: 0.75rem; }
+    .prospect-card .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .prospect-card .actions button { border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+    .prospect-card .actions button.primary { background: var(--brand); color: #0a0f1a; border-color: var(--brand); font-weight: 600; }
+    .email-preview { display: none; margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; font-size: 0.8rem; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    .email-preview.show { display: block; }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="/index.html"><span class="brand-mark">G</span><span class="brand-text">GeoNeo AI</span></a>
+    <span style="color:var(--muted);font-size:0.85rem;">Admin · Prospect Hunter</span>
+  </header>
+
+  <main class="admin-wrap">
+    <div class="admin-header">
+      <h1>🎯 Prospect Hunter</h1>
+      <p>Find businesses in an industry + area, audit their websites, and send outreach emails.</p>
+    </div>
+
+    <form class="prospect-form" id="prospectForm">
+      <label>Industry *
+        <input type="text" name="industry" placeholder="Towing, HVAC, dental..." required />
+      </label>
+      <label>City *
+        <input type="text" name="city" placeholder="Branson" required />
+      </label>
+      <label>State
+        <input type="text" name="state" placeholder="MO" maxlength="2" />
+      </label>
+      <button type="submit">🔍 Find & Audit</button>
+    </form>
+
+    <div class="status-bar" id="statusBar"></div>
+    <div class="results-grid" id="resultsGrid"></div>
+  </main>
+
+  <script>
+  (function() {
+    var form = document.getElementById('prospectForm');
+    var statusBar = document.getElementById('statusBar');
+    var grid = document.getElementById('resultsGrid');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var fd = new FormData(form);
+      var industry = fd.get('industry').trim();
+      var city = fd.get('city').trim();
+      var state = fd.get('state').trim();
+      if (!industry || !city) return;
+
+      grid.innerHTML = '';
+      statusBar.className = 'status-bar active';
+      statusBar.textContent = 'Discovering businesses in ' + industry + ' near ' + city + '...';
+
+      var params = new URLSearchParams({ industry: industry, city: city, state: state });
+      fetch('/api/admin/prospect?' + params.toString())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) { statusBar.className = 'status-bar error'; statusBar.textContent = data.error; return; }
+          statusBar.className = 'status-bar active';
+          statusBar.textContent = 'Found ' + data.prospects.length + ' businesses. Audits complete.';
+          renderResults(data.prospects, data.context);
+        })
+        .catch(function(err) {
+          statusBar.className = 'status-bar error';
+          statusBar.textContent = 'Error: ' + (err.message || 'Request failed');
+        });
+    });
+
+    function renderResults(prospects, ctx) {
+      grid.innerHTML = '';
+      prospects.forEach(function(p) {
+        var card = document.createElement('div');
+        card.className = 'prospect-card';
+        var scoreClass = p.score >= 70 ? 'good' : (p.score >= 45 ? 'ok' : 'bad');
+        var revLost = p.revenueLost ? '$' + p.revenueLost.low + '–$' + p.revenueLost.high + '/mo lost revenue' : '';
+        var topIssues = (p.topIssues || []).slice(0, 3).join(' · ');
+
+        card.innerHTML = '<div class="card-top"><div><h3>' + esc(p.name) + '</h3><div class="domain">' + esc(p.website) + '</div></div><div class="score-badge ' + scoreClass + '">' + p.score + '</div></div>'
+          + (topIssues ? '<div class="issues">' + esc(topIssues) + '</div>' : '')
+          + (revLost ? '<div class="revenue-lost">💰 ' + revLost + '</div>' : '')
+          + '<div class="actions"><button class="primary" data-idx="' + prospects.indexOf(p) + '">📧 Preview Email</button><button data-copy="' + prospects.indexOf(p) + '">Copy Email</button></div>'
+          + '<div class="email-preview" id="email-' + prospects.indexOf(p) + '"></div>';
+        grid.appendChild(card);
+      });
+
+      // Wire email buttons
+      grid.querySelectorAll('button[data-idx]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = this.getAttribute('data-idx');
+          var el = document.getElementById('email-' + idx);
+          if (el.classList.contains('show')) { el.classList.remove('show'); return; }
+          el.textContent = buildEmail(prospects[idx], ctx);
+          el.classList.add('show');
+        });
+      });
+      grid.querySelectorAll('button[data-copy]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = this.getAttribute('data-copy');
+          var text = buildEmail(prospects[idx], ctx);
+          navigator.clipboard.writeText(text).then(function() { btn.textContent = '✓ Copied'; });
+        });
+      });
+    }
+
+    function buildEmail(p, ctx) {
+      var revLine = p.revenueLost ? '\n\n💰 ESTIMATED REVENUE YOU\'RE MISSING\nBased on your industry and location, we estimate you\'re losing approximately $' + p.revenueLost.low + '–$' + p.revenueLost.high + ' per month in potential customers who are finding your competitors instead of you. That\'s $' + (p.revenueLost.low * 12) + '–$' + (p.revenueLost.high * 12) + ' per year.' : '';
+
+      return 'Subject: I ran a free visibility audit on ' + p.name + ' — here\'s what I found\n\n'
+        + 'Hi,\n\n'
+        + 'I was researching ' + ctx.industry + ' businesses in ' + ctx.city + ' and ran a free visibility audit on your website (' + p.website + ').\n\n'
+        + 'Here\'s a quick summary:\n\n'
+        + '📊 VISIBILITY SCORE: ' + p.score + '/100\n'
+        + (p.score < 60 ? '(This means most potential customers can\'t find you when they search online.)\n' : '(Decent foundation, but competitors are outranking you in key areas.)\n')
+        + '\n🔍 TOP ISSUES FOUND:\n'
+        + (p.topIssues || []).map(function(i, n) { return (n+1) + '. ' + i; }).join('\n')
+        + '\n\n🏆 YOUR COMPETITION:\n'
+        + 'You\'re currently ranked below ' + (p.competitorsAbove || 'several') + ' other ' + ctx.industry + ' businesses in ' + ctx.city + ' search results.'
+        + revLine
+        + '\n\n---\n\n'
+        + 'I can fix these issues for you or walk your web team through exactly what to change.\n\n'
+        + 'Would you like me to send over the full report? No cost, no obligation.\n\n'
+        + 'Best,\n'
+        + 'Matt\n'
+        + 'GeoNeo AI\n'
+        + 'hello@geoneo.ai';
+    }
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  })();
+  </script>
+</body>
+</html>

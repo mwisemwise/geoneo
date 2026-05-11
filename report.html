@@ -59,6 +59,10 @@
     .error-state { text-align: center; padding: 3rem 1rem; }
     .error-state h2 { color: #ff6b6b; }
     .error-state p { color: var(--muted); }
+    @media (max-width: 600px) {
+      .swot-grid { grid-template-columns: 1fr !important; }
+      .channel-grid { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
@@ -258,20 +262,203 @@
       html += '</div>';
 
       if (hasNoData && mode === 'market') {
-        // No data scenario — show helpful message instead of zeros
+        // No data scenario — show helpful message for market/industry research
         html += '<div style="text-align:center;padding:2rem;border:1px solid var(--line);border-radius:16px;margin-bottom:2rem;">';
-        html += '<p style="font-size:1.3rem;margin:0 0 0.75rem;">⚠️ Limited data available</p>';
-        html += '<p style="color:var(--muted);max-width:500px;margin:0 auto 1rem;">We couldn\'t find enough search data for <strong>' + esc(businessLabel) + '</strong> in <strong>' + esc(city || 'your area') + '</strong>. This usually means:</p>';
+        html += '<p style="font-size:1.3rem;margin:0 0 0.75rem;">⚠️ Limited market data available</p>';
+        html += '<p style="color:var(--muted);max-width:500px;margin:0 auto 1rem;">We couldn\'t find enough businesses ranking for <strong>' + esc(businessLabel) + '</strong> in <strong>' + esc(city || 'your area') + '</strong>. This usually means:</p>';
         html += '<ul style="text-align:left;max-width:400px;margin:0 auto;color:var(--muted);font-size:0.9rem;">';
-        html += '<li>Your business doesn\'t have a website yet (enter a URL for a full audit)</li>';
-        html += '<li>The business name wasn\'t found in search results</li>';
-        html += '<li>Try entering your actual website URL for the most accurate results</li>';
+        html += '<li>Try a broader industry term (e.g., "plumbing" instead of "drain cleaning")</li>';
+        html += '<li>Try a larger nearby city if your area is very small</li>';
+        html += '<li>This industry may have very few businesses online in this area — which could be a big opportunity</li>';
         html += '</ul>';
         html += '</div>';
-        html += '<div class="cta-box"><h3>Try again with your website URL</h3><p>For the most accurate audit, enter your actual website address (e.g., www.yourbusiness.com)</p><a class="btn btn-hot" href="index.html">Run Another Audit</a></div>';
+        html += '<div class="cta-box"><h3>Try a different search</h3><p>Broaden the industry term or try a nearby city with more businesses.</p><a class="btn btn-hot" href="index.html">Run Another Audit</a></div>';
         document.getElementById('reportMain').innerHTML = html;
         return;
       }
+
+      // === MARKET OVERVIEW (industry mode only — leads the report) ===
+      if (mode === 'market') {
+        var mktOpp = data.marketOpportunity || {};
+        var mktState = mktOpp.marketState || {};
+        var indAnalysis = data.industryAnalysis || {};
+        var difficulty = indAnalysis.difficulty || {};
+        var opportunities = indAnalysis.opportunities || {};
+        var strategy = indAnalysis.strategy || {};
+        var marketLabel = esc((industry || businessLabel)) + ' in ' + esc(city || 'your area') + (state ? ', ' + esc(state) : '');
+
+        // --- Difficulty + Local vs National ---
+        html += '<div class="report-section" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.5rem;margin-bottom:2rem;">';
+        html += '<h2 style="border:none;padding:0;margin:0 0 1rem;">📊 Market Overview</h2>';
+
+        // Difficulty badge
+        var diffLabel = mktState.marketDifficultyLabel || 'Unknown';
+        var diffColor = diffLabel === 'Wide Open' || diffLabel === 'Easy' ? 'var(--brand)' : (diffLabel === 'Moderate' ? '#ffa657' : '#ff6b6b');
+        html += '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">';
+        html += '<span style="font-weight:700;font-size:1rem;">Difficulty:</span>';
+        html += '<span style="background:' + diffColor + ';color:#0a0f1a;font-weight:700;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.9rem;">' + esc(diffLabel) + '</span>';
+        html += '<span style="color:var(--muted);font-size:0.85rem;">Timeline to first page: ' + esc(mktState.estimatedTimeline || '—') + '</span>';
+        html += '</div>';
+
+        // Local vs National comparison
+        html += '<div style="margin-bottom:1rem;padding:0.75rem;border:1px solid var(--line);border-radius:10px;">';
+        html += '<div style="font-weight:600;font-size:0.9rem;margin-bottom:0.4rem;">🏠 Local vs. National Comparison</div>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin:0;">' + esc(mktState.nationalComparison || 'Not enough data to compare against national averages.') + '</p>';
+        html += '</div>';
+
+        // Domination potential
+        var domPotential = mktState.dominationPotential || 'Unknown';
+        var domColor = domPotential === 'Very High' || domPotential === 'High' ? 'var(--brand)' : (domPotential === 'Moderate' ? '#ffa657' : '#ff6b6b');
+        html += '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">';
+        html += '<span style="font-size:0.9rem;font-weight:600;">Can you dominate this market?</span>';
+        html += '<span style="color:' + domColor + ';font-weight:700;">' + esc(domPotential) + ' potential</span>';
+        html += '</div>';
+        html += '</div>';
+
+        // --- SWOT-style Analysis ---
+        html += '<div class="report-section">';
+        html += '<h2>💡 Market Strengths, Weaknesses & Opportunities</h2>';
+        html += '<div class="swot-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;">';
+
+        // Strengths (of the market — what's working for current players)
+        var strengths = [];
+        if ((displayScores.localPresence || 0) >= 55) strengths.push('Local businesses are actively showing up in Maps');
+        if ((displayScores.technical || 0) >= 60) strengths.push('Active market with real customer demand');
+        if (competitors.length >= 3) strengths.push(competitors.length + ' businesses competing for visibility');
+        if (!strengths.length) strengths.push('Market has some established players');
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;">';
+        html += '<div style="font-weight:700;color:var(--brand);font-size:0.85rem;margin-bottom:0.4rem;">STRENGTHS (current market)</div>';
+        strengths.forEach(function(s) { html += '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem;">• ' + esc(s) + '</div>'; });
+        html += '</div>';
+
+        // Weaknesses (gaps you can exploit)
+        var weaknesses = [];
+        if ((mktState.averageWebsiteQualityEstimate || 0) < 55) weaknesses.push('Most competitor websites are low quality');
+        if ((displayScores.conversionUx || 0) >= 40) weaknesses.push('Directories outrank actual businesses');
+        if ((displayScores.aiVisibility || 0) < 40) weaknesses.push('Nobody is set up for AI search yet');
+        var weakComps = opportunities.weakCompetitorsInTop10 || [];
+        if (weakComps.length) weaknesses.push(weakComps.length + ' weak competitors still ranking in top 10');
+        if (!weaknesses.length) weaknesses.push('Some competitors have outdated websites');
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;">';
+        html += '<div style="font-weight:700;color:#ff6b6b;font-size:0.85rem;margin-bottom:0.4rem;">WEAKNESSES (gaps to exploit)</div>';
+        weaknesses.forEach(function(w) { html += '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem;">• ' + esc(w) + '</div>'; });
+        html += '</div>';
+
+        // Opportunities
+        var opps = [];
+        var keyOpps = opportunities.keyOpportunities || [];
+        keyOpps.forEach(function(o) { if (o) opps.push(o); });
+        if ((displayScores.aiVisibility || 0) < 50) opps.push('First to optimize for AI search wins big');
+        if (!opps.length) opps.push('Room to differentiate with better content and reviews');
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;">';
+        html += '<div style="font-weight:700;color:#ffa657;font-size:0.85rem;margin-bottom:0.4rem;">OPPORTUNITIES</div>';
+        opps.slice(0, 3).forEach(function(o) { html += '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem;">• ' + esc(o) + '</div>'; });
+        html += '</div>';
+
+        // Threats
+        var threats = [];
+        if ((displayScores.seo || 0) >= 70) threats.push('Strong incumbents are actively investing in SEO');
+        if (competitors.length && competitors[0].strengthScore >= 75) threats.push('Market leader (' + esc(competitors[0].companyName || competitors[0].domain) + ') has strong visibility');
+        if ((mktState.localCompetitionDensity || 0) >= 60) threats.push('High density of competing businesses');
+        if (!threats.length) threats.push('New competitors could enter at any time');
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;">';
+        html += '<div style="font-weight:700;color:#ff6b6b;font-size:0.85rem;margin-bottom:0.4rem;">THREATS</div>';
+        threats.forEach(function(t) { html += '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem;">• ' + esc(t) + '</div>'; });
+        html += '</div>';
+
+        html += '</div>'; // end grid
+        html += '</div>'; // end section
+
+        // --- What It Takes to Be #1 ---
+        html += '<div class="report-section" style="background:rgba(0,229,160,0.04);border:1px solid rgba(0,229,160,0.2);border-radius:14px;padding:1.5rem;margin-bottom:2rem;">';
+        html += '<h2 style="border:none;padding:0;margin:0 0 0.75rem;color:var(--brand);">🏆 What It Takes to Be #1</h2>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">To dominate ' + marketLabel + ', a business needs:</p>';
+        html += '<div style="display:grid;gap:0.5rem;">';
+
+        var toBeFirst = [];
+        if (competitors.length && competitors[0]) {
+          var leader = competitors[0];
+          if ((leader.mapPackAppearances || 0) > 0) toBeFirst.push('A fully optimized Google Business Profile with ' + (leader.reviews ? leader.reviews + '+ reviews' : 'strong reviews') + ' to own the Maps results');
+          if ((leader.searchAppearances || 0) > 1) toBeFirst.push('A website that ranks for multiple search terms (the current leader shows up in ' + leader.searchAppearances + ' different searches)');
+          if (leader.hasStructuredData) toBeFirst.push('Structured content that AI tools can read and recommend');
+        }
+        if (!toBeFirst.length || toBeFirst.length < 3) {
+          toBeFirst.push('A complete Google Business Profile with consistent reviews coming in weekly');
+          toBeFirst.push('A website with dedicated pages for each service you offer in this area');
+          toBeFirst.push('Content structured so AI search tools (ChatGPT, Google AI) recommend you');
+        }
+        toBeFirst.push('Consistent business information across all directories and listings');
+        toBeFirst.slice(0, 4).forEach(function(item, idx) {
+          html += '<div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:0.88rem;">';
+          html += '<span style="min-width:1.4rem;height:1.4rem;border-radius:50%;background:var(--brand);color:#0a0f1a;display:grid;place-items:center;font-size:0.7rem;font-weight:700;">' + (idx + 1) + '</span>';
+          html += '<span style="color:var(--ink);">' + esc(item) + '</span></div>';
+        });
+        html += '</div></div>';
+
+        // --- GBP vs SEO vs GEO Breakdown ---
+        html += '<div class="report-section">';
+        html += '<h2>📍 GBP vs. SEO vs. GEO — Where the Visibility Lives</h2>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">Three channels drive customers to local businesses. Here\'s how this market breaks down:</p>';
+
+        // Calculate averages from competitors
+        var totalGBP = 0, totalSEO = 0, totalGEO = 0, compCount = Math.max(competitors.length, 1);
+        competitors.forEach(function(c) {
+          totalGBP += (c.mapPackAppearances || 0);
+          totalSEO += (c.searchAppearances || 0);
+          totalGEO += (c.aiVisibility || 0);
+        });
+        var gbpAvg = Math.round((totalGBP / compCount) * 20); // normalize to 0-100 scale
+        var seoAvg = Math.round((totalSEO / compCount) * 15);
+        var geoAvg = Math.round(totalGEO / compCount);
+        gbpAvg = Math.min(100, Math.max(5, gbpAvg));
+        seoAvg = Math.min(100, Math.max(5, seoAvg));
+        geoAvg = Math.min(100, Math.max(5, geoAvg));
+
+        html += '<div class="channel-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1rem;">';
+
+        // GBP card
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;text-align:center;">';
+        html += '<div style="font-size:1.5rem;margin-bottom:0.3rem;">📍</div>';
+        html += '<div style="font-weight:700;font-size:0.85rem;">Google Business Profile</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">(Maps & Local Pack)</div>';
+        html += '<div style="font-size:1.3rem;font-weight:700;color:' + (gbpAvg >= 50 ? 'var(--brand)' : '#ffa657') + ';">' + gbpAvg + '/100</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);">' + (gbpAvg >= 60 ? 'Competitors are active here' : 'Underused — big opportunity') + '</div>';
+        html += '</div>';
+
+        // SEO card
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;text-align:center;">';
+        html += '<div style="font-size:1.5rem;margin-bottom:0.3rem;">🔍</div>';
+        html += '<div style="font-weight:700;font-size:0.85rem;">Website SEO</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">(Organic Google Rankings)</div>';
+        html += '<div style="font-size:1.3rem;font-weight:700;color:' + (seoAvg >= 50 ? 'var(--brand)' : '#ffa657') + ';">' + seoAvg + '/100</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);">' + (seoAvg >= 60 ? 'Strong organic competition' : 'Weak websites — easy to outrank') + '</div>';
+        html += '</div>';
+
+        // GEO card
+        html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;text-align:center;">';
+        html += '<div style="font-size:1.5rem;margin-bottom:0.3rem;">🤖</div>';
+        html += '<div style="font-weight:700;font-size:0.85rem;">GEO (AI Search)</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">(ChatGPT, Google AI, etc.)</div>';
+        html += '<div style="font-size:1.3rem;font-weight:700;color:' + (geoAvg >= 50 ? 'var(--brand)' : '#ffa657') + ';">' + geoAvg + '/100</div>';
+        html += '<div style="font-size:0.75rem;color:var(--muted);">' + (geoAvg >= 40 ? 'Some AI readiness detected' : 'Wide open — almost nobody is ready') + '</div>';
+        html += '</div>';
+
+        html += '</div>'; // end grid
+
+        // Comparison to national
+        html += '<div style="font-size:0.85rem;color:var(--muted);padding:0.6rem;border-top:1px solid var(--line);">';
+        html += '<strong style="color:var(--ink);">vs. National:</strong> ';
+        if (gbpAvg < 40 && seoAvg < 40) {
+          html += 'This local market is significantly behind national averages across all three channels. A business that invests in any one of these will stand out immediately.';
+        } else if (geoAvg < 30) {
+          html += 'GBP and SEO are somewhat competitive locally, but AI search (GEO) is virtually untouched. Nationally, early adopters are already winning AI citations — this market hasn\'t caught up yet.';
+        } else {
+          html += 'This market is keeping pace with national trends in traditional search, but there\'s still room to lead in AI visibility and local proof.';
+        }
+        html += '</div>';
+        html += '</div>'; // end section
+      }
+      // === END MARKET OVERVIEW ===
 
       // Overall score ring
       html += renderScoreRing(overall);
@@ -280,12 +467,12 @@
       // Category scores
       html += '<div class="category-scores">';
       if (mode === 'market') {
-        html += catScore(displayScores.seo, 'Competition');
-        html += catScore(displayScores.localPresence, 'Local Visibility');
-        html += catScore(displayScores.aiVisibility, 'Opportunity');
-        html += catScore(displayScores.technical, 'Market Activity');
-        html += catScore(displayScores.reputation, 'Lead Potential');
-        html += catScore(displayScores.conversionUx, 'Directory Presence');
+        html += catScore(displayScores.seo, 'Competition', 'higher = harder to break in');
+        html += catScore(displayScores.localPresence, 'Local Visibility', 'higher = more businesses showing up');
+        html += catScore(displayScores.aiVisibility, 'Opportunity', 'higher = more room for you');
+        html += catScore(displayScores.technical, 'Market Activity', 'higher = more active market');
+        html += catScore(displayScores.reputation, 'Lead Potential', 'higher = more customers searching');
+        html += catScore(displayScores.conversionUx, 'Directory Presence', 'higher = directories dominate');
       } else {
         html += catScore(displayScores.seo, 'Google SEO');
         html += catScore(displayScores.localPresence, 'Local Presence');
@@ -443,10 +630,11 @@
         '<div class="score-label"><span class="score-num">' + score + '</span><span class="score-of">out of 100</span></div></div>';
     }
 
-    function catScore(val, label) {
+    function catScore(val, label, hint) {
       var v = typeof val === 'number' ? val : 0;
       var color = v >= 70 ? 'var(--brand)' : (v >= 45 ? '#ffa657' : '#ff6b6b');
-      return '<div class="cat-score"><div class="cat-val" style="color:' + color + '">' + v + '</div><div class="cat-label">' + esc(label) + '</div></div>';
+      var hintHtml = hint ? '<div style="font-size:0.65rem;color:var(--muted);margin-top:0.15rem;opacity:0.7;">' + esc(hint) + '</div>' : '';
+      return '<div class="cat-score"><div class="cat-val" style="color:' + color + '">' + v + '</div><div class="cat-label">' + esc(label) + '</div>' + hintHtml + '</div>';
     }
 
     function renderFindings(scores, issues, searchPos) {
@@ -470,14 +658,14 @@
             ? 'Local businesses are showing up in Maps and local results.'
             : 'Few businesses are properly set up for Google Maps and local search.',
           localStrong
-            ? 'The Google Maps 3-pack is contested. Winning it requires strong reviews, accurate NAP, and local content.'
-            : 'The local pack is underserved. A business with proper Google Business Profile setup and reviews can own this space quickly.'
+            ? 'The top 3 Google Maps spots are held by strong competitors. Winning them requires great reviews, accurate business info, and local content.'
+            : 'The top Google Maps spots are wide open. A business with a complete Google Business Profile and good reviews can claim them quickly.'
         );
 
         var dirHeavy = (scores.conversionUx || 0) >= 40;
         html += finding(dirHeavy ? 'warn' : 'pass',
           dirHeavy
-            ? 'Directories (Yelp, Angi, etc.) occupy significant search real estate in this market.'
+            ? 'Directories (Yelp, Angi, etc.) take up most of the Google results in this market.'
             : 'Directories have minimal presence — standalone business websites can rank directly.',
           dirHeavy
             ? 'When directories dominate, it means local businesses haven\'t built strong enough websites to outrank them. This is an opportunity.'
@@ -569,6 +757,32 @@
       var title = fix.title || '';
       var desc = fix.description || '';
 
+      // Market/strategy-specific translations (checked first for market mode fixes)
+      var marketTranslations = {
+        'map pack control': { t: 'Get into the top Google Maps results', d: 'The top 3 spots in Google Maps get the most calls. Build up your reviews and keep your business info accurate to claim one of those spots.' },
+        'map-pack': { t: 'Get into the top Google Maps results', d: 'The top 3 spots in Google Maps get the most calls. Build up your reviews and keep your business info accurate to claim one of those spots.' },
+        'serp messaging': { t: 'Make your Google listing stand out', d: 'When your business shows up in search results, the title and description need to clearly say what you do and why someone should pick you over competitors.' },
+        'query coverage': { t: 'Show up for more searches customers are doing', d: 'Customers search in many different ways. Create pages that match the different ways people look for your service in your area.' },
+        'search momentum': { t: 'Build consistent visibility over time', d: 'Start showing up for easier searches first, then expand to more competitive ones as Google sees you as a trusted result.' },
+        'intent cluster': { t: 'Cover the topics customers care about', d: 'Write content that answers the specific questions and needs your customers have when looking for this service.' },
+        'citation leader': { t: 'Become the business AI recommends', d: 'AI tools recommend businesses that have clear, well-organized information online. Structure your content so AI can easily understand and suggest you.' },
+        'ai citation': { t: 'Get recommended by AI search tools', d: 'When people ask ChatGPT or Google AI for recommendations, they pull from businesses with clear, well-structured content. Set yours up to be the answer.' },
+        'local-proof': { t: 'Show real proof you serve this area', d: 'Reviews, local photos, and mentions of your service area help Google trust that you actually serve the customers searching nearby.' },
+        'market positioning': { t: 'Stand out from existing competitors', d: 'Create a clear offer that\'s different from what the current top businesses are saying. Give customers a reason to choose you specifically.' },
+        'defensive growth': { t: 'Protect your rankings once you get them', d: 'Keep your content fresh and your reviews coming in so competitors can\'t push you back down after you start ranking.' },
+        'brand recall': { t: 'Make customers remember your name', d: 'Use consistent messaging across all your listings so people see your business repeatedly and remember you when they\'re ready to buy.' },
+        'high-conversion': { t: 'Create an offer that gets people to call', d: 'Your website needs a clear, compelling reason for someone to pick up the phone or fill out a form right now.' },
+        'proof and authority': { t: 'Build trust that beats weaker competitors', d: 'Show reviews, credentials, before/after photos, and clear results. Businesses with more proof win more customers even if they rank lower.' }
+      };
+
+      var combined = (title + ' ' + desc).toLowerCase();
+
+      for (var mkey in marketTranslations) {
+        if (combined.indexOf(mkey) !== -1) {
+          return { title: marketTranslations[mkey].t, desc: marketTranslations[mkey].d };
+        }
+      }
+
       // Translate technical jargon into business impact
       var translations = {
         'structured data': { t: 'Help Google understand your business better', d: 'Your website is missing information that helps Google and AI systems know what you do, where you are, and why customers should choose you.' },
@@ -586,7 +800,6 @@
         'grammar': { t: 'Fix writing issues that hurt credibility', d: 'Spelling and grammar errors make your business look less professional and can reduce trust with potential customers.' }
       };
 
-      var combined = (title + ' ' + desc).toLowerCase();
       for (var key in translations) {
         if (combined.indexOf(key) !== -1) {
           return { title: translations[key].t, desc: translations[key].d };
@@ -601,7 +814,8 @@
     }
 
     function renderCompetitors(comps, yourScore) {
-      var html = '<table class="competitor-table"><thead><tr><th>Business</th><th>Visibility</th><th>Where They Beat You</th></tr></thead><tbody>';
+      var colHeader = mode === 'market' ? 'Key Strengths' : 'Where They Beat You';
+      var html = '<table class="competitor-table"><thead><tr><th>Business</th><th>Visibility</th><th>' + colHeader + '</th></tr></thead><tbody>';
       for (var i = 0; i < comps.length; i++) {
         var c = comps[i];
         var strength = c.strengthScore || c.scoreSummary && c.scoreSummary.seo || 50;
