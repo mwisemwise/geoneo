@@ -80,18 +80,18 @@
 
       <div class="audit-box">
         <form id="auditForm">
-          <label>Business website OR name
-            <input type="text" name="url" placeholder="www.example.com or 'Joe's Plumbing'" required autocomplete="off" />
+          <label>Business website OR industry
+            <input type="text" name="url" placeholder="www.example.com or 'towing', 'shows', 'plumbing'..." autocomplete="off" />
           </label>
           <div class="row">
             <label>City
-              <input type="text" name="city" placeholder="Dallas" />
+              <input type="text" name="city" placeholder="Branson" />
             </label>
             <label>State
-              <input type="text" name="state" placeholder="TX" maxlength="2" />
+              <input type="text" name="state" placeholder="MO" maxlength="2" />
             </label>
           </div>
-          <label>Industry (optional)
+          <label>Industry (if not entered above)
             <input type="text" name="industry" placeholder="Plumbing, dental, roofing..." />
           </label>
           <button type="submit">Run My Free Audit</button>
@@ -176,12 +176,18 @@
       var city = (fd.get('city') || '').trim();
       var state = (fd.get('state') || '').trim();
       var industry = (fd.get('industry') || '').trim();
-      if (!url) return;
+      // Allow: URL in first field, OR industry in first field, OR industry in industry field
+      var input = url || industry;
+      if (!input && !city) { alert('Enter a website, industry, or city to get started.'); return; }
       var params = new URLSearchParams();
-      params.set('url', url);
+      if (url) params.set('url', url);
       if (city) params.set('city', city);
       if (state) params.set('state', state);
       if (industry) params.set('industry', industry);
+      // If no URL field but have industry, use industry as the main input
+      if (!url && industry) params.set('url', industry);
+      // If have city but nothing else, use city as context
+      if (!url && !industry && city) params.set('url', city);
       window.location.href = 'report.html?' + params.toString();
     });
     document.getElementById('ctaScrollBtn').addEventListener('click', function(e) {
