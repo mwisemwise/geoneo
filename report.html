@@ -85,6 +85,15 @@
     var state = params.get('state') || '';
     var industry = params.get('industry') || '';
 
+    // Parse natural language input like "branson mo tow" or "tow companies branson mo"
+    if (urlInput && !city && !/^(https?:\/\/|www\.)|(\.\w{2,})/.test(urlInput)) {
+      var parsed = parseNaturalInput(urlInput, city, state, industry);
+      city = parsed.city || city;
+      state = parsed.state || state;
+      industry = parsed.industry || industry;
+      urlInput = parsed.industry || urlInput;
+    }
+
     if (!urlInput && !industry && !city) {
       showError('No business information provided.', 'Go back and enter your website or business name.');
       return;
@@ -125,6 +134,56 @@
     }, 8000);
 
     var mode = ''; // set in renderReport, used by gradeFromScore
+
+    var US_STATES = {al:'alabama',ak:'alaska',az:'arizona',ar:'arkansas',ca:'california',co:'colorado',ct:'connecticut',de:'delaware',fl:'florida',ga:'georgia',hi:'hawaii',id:'idaho',il:'illinois',in:'indiana',ia:'iowa',ks:'kansas',ky:'kentucky',la:'louisiana',me:'maine',md:'maryland',ma:'massachusetts',mi:'michigan',mn:'minnesota',ms:'mississippi',mo:'missouri',mt:'montana',ne:'nebraska',nv:'nevada',nh:'new hampshire',nj:'new jersey',nm:'new mexico',ny:'new york',nc:'north carolina',nd:'north dakota',oh:'ohio',ok:'oklahoma',or:'oregon',pa:'pennsylvania',ri:'rhode island',sc:'south carolina',sd:'south dakota',tn:'tennessee',tx:'texas',ut:'utah',vt:'vermont',va:'virginia',wa:'washington',wv:'west virginia',wi:'wisconsin',wy:'wyoming'};
+    var STATE_ABBREVS = Object.keys(US_STATES);
+
+    function parseNaturalInput(raw) {
+      // Splits "branson mo tow" or "tow companies branson mo" into parts
+      var words = raw.trim().split(/[\s,]+/);
+      var foundState = '';
+      var foundCity = '';
+      var industryWords = [];
+
+      // Find state abbreviation
+      for (var i = 0; i < words.length; i++) {
+        if (STATE_ABBREVS.indexOf(words[i].toLowerCase()) !== -1) {
+          foundState = words[i].toUpperCase();
+          words.splice(i, 1);
+          break;
+        }
+      }
+
+      // Known cities (common ones)
+      var knownCities = ['branson','springfield','nixa','ozark','joplin','dallas','austin','houston','tulsa','fayetteville','rogers','bentonville','hollister','forsyth'];
+      for (var j = 0; j < words.length; j++) {
+        if (knownCities.indexOf(words[j].toLowerCase()) !== -1) {
+          foundCity = words[j].charAt(0).toUpperCase() + words[j].slice(1).toLowerCase();
+          words.splice(j, 1);
+          break;
+        }
+      }
+
+      // If no known city found but we have a state, the word before the state might be the city
+      if (!foundCity && foundState && words.length > 0) {
+        // Try last remaining word as city if it's not a service keyword
+        var serviceWords = ['tow','towing','plumber','plumbing','hvac','roofing','shows','dental','legal','electrician','pest','tree','garage','restoration','locksmith','auto','mechanic'];
+        for (var k = words.length - 1; k >= 0; k--) {
+          if (serviceWords.indexOf(words[k].toLowerCase()) === -1) {
+            foundCity = words[k].charAt(0).toUpperCase() + words[k].slice(1).toLowerCase();
+            words.splice(k, 1);
+            break;
+          }
+        }
+      }
+
+      industryWords = words.filter(function(w) { return w.length > 0; });
+      return {
+        city: foundCity,
+        state: foundState,
+        industry: industryWords.join(' ')
+      };
+    }
 
     fetch('/api/audit?' + apiParams.toString())
       .then(function(r) { return r.json(); })
