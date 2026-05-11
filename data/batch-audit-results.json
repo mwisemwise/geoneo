@@ -1,0 +1,458 @@
+{
+  "timestamp": "2026-05-03T15:24:12.720Z",
+  "total": 50,
+  "completed": 50,
+  "failed": 0,
+  "results": [
+    {
+      "url": "chrisstowingrecovery.com",
+      "industry": "towing",
+      "overall": 90,
+      "seo": 90,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "schraderstowingmo.com",
+      "industry": "towing",
+      "overall": 0,
+      "seo": 0,
+      "ai": 0,
+      "geo": 0,
+      "status": "ok"
+    },
+    {
+      "url": "daveysautobody.com",
+      "industry": "towing",
+      "overall": 75,
+      "seo": 30,
+      "ai": 57,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "crawfordsautomotiveandtowing.com",
+      "industry": "towing",
+      "overall": 50,
+      "seo": 40,
+      "ai": 71,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "anchorroadside.com",
+      "industry": "towing",
+      "overall": 90,
+      "seo": 90,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "rpmrecovery.com",
+      "industry": "towing",
+      "overall": 60,
+      "seo": 20,
+      "ai": 29,
+      "geo": 50,
+      "status": "ok"
+    },
+    {
+      "url": "servicewisetowing.com",
+      "industry": "towing",
+      "overall": 50,
+      "seo": 40,
+      "ai": 29,
+      "geo": 50,
+      "status": "ok"
+    },
+    {
+      "url": "mohneystowinginc.net",
+      "industry": "towing",
+      "overall": 100,
+      "seo": 80,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "thebransonhotel.com",
+      "industry": "hotel",
+      "overall": 65,
+      "seo": 100,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "thebradford.net",
+      "industry": "hotel",
+      "overall": 45,
+      "seo": 60,
+      "ai": 86,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "theozarkerlodge.com",
+      "industry": "hotel",
+      "overall": 70,
+      "seo": 80,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "grottoresort.com",
+      "industry": "hotel",
+      "overall": 75,
+      "seo": 70,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransoncarriagehouseinn.com",
+      "industry": "hotel",
+      "overall": 65,
+      "seo": 50,
+      "ai": 71,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "greengablesinnbranson.com",
+      "industry": "hotel",
+      "overall": 75,
+      "seo": 80,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonsbest.com",
+      "industry": "hotel",
+      "overall": 40,
+      "seo": 60,
+      "ai": 57,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "myerhospitality.com",
+      "industry": "hotel",
+      "overall": 75,
+      "seo": 70,
+      "ai": 86,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "angelinnbranson.com",
+      "industry": "hotel",
+      "overall": 30,
+      "seo": 30,
+      "ai": 43,
+      "geo": 50,
+      "status": "ok"
+    },
+    {
+      "url": "gazeboinn.com",
+      "industry": "hotel",
+      "overall": 0,
+      "seo": 0,
+      "ai": 0,
+      "geo": 0,
+      "status": "ok"
+    },
+    {
+      "url": "bransonuptown.com",
+      "industry": "restaurant",
+      "overall": 55,
+      "seo": 70,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "localflavorbranson.com",
+      "industry": "restaurant",
+      "overall": 50,
+      "seo": 60,
+      "ai": 86,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "billygailsrestaurant.com",
+      "industry": "restaurant",
+      "overall": 55,
+      "seo": 80,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "blackoakgrill.com",
+      "industry": "restaurant",
+      "overall": 70,
+      "seo": 90,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "ssdockside.com",
+      "industry": "restaurant",
+      "overall": 40,
+      "seo": 70,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "guysbranson.com",
+      "industry": "restaurant",
+      "overall": 85,
+      "seo": 90,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "branson.landsharkbarandgrill.com",
+      "industry": "restaurant",
+      "overall": 80,
+      "seo": 60,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonsbestrestaurants.com",
+      "industry": "restaurant",
+      "overall": 0,
+      "seo": 0,
+      "ai": 0,
+      "geo": 0,
+      "status": "ok"
+    },
+    {
+      "url": "dinebranson.com",
+      "industry": "restaurant",
+      "overall": 80,
+      "seo": 60,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "farmhouserestaurantbranson.com",
+      "industry": "restaurant",
+      "overall": 40,
+      "seo": 70,
+      "ai": 71,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "sight-sound.com",
+      "industry": "entertainment",
+      "overall": 85,
+      "seo": 90,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "claycoopertheatre.com",
+      "industry": "entertainment",
+      "overall": 55,
+      "seo": 70,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "themansiontheatre.com",
+      "industry": "entertainment",
+      "overall": 55,
+      "seo": 80,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonshowtickets.com",
+      "industry": "entertainment",
+      "overall": 55,
+      "seo": 60,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonshows.com",
+      "industry": "entertainment",
+      "overall": 70,
+      "seo": 60,
+      "ai": 71,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "allaccessbranson.com",
+      "industry": "entertainment",
+      "overall": 45,
+      "seo": 40,
+      "ai": 57,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "explorebranson.com",
+      "industry": "entertainment",
+      "overall": 30,
+      "seo": 50,
+      "ai": 71,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransontourismcenter.com",
+      "industry": "entertainment",
+      "overall": 0,
+      "seo": 0,
+      "ai": 0,
+      "geo": 0,
+      "status": "ok"
+    },
+    {
+      "url": "breakingbassguideservice.com",
+      "industry": "fishing guide",
+      "overall": 75,
+      "seo": 100,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonfishingadventures.com",
+      "industry": "fishing guide",
+      "overall": 60,
+      "seo": 50,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "bransonguidedfishingtrips.com",
+      "industry": "fishing guide",
+      "overall": 75,
+      "seo": 100,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "ericseliteguideservice.com",
+      "industry": "fishing guide",
+      "overall": 70,
+      "seo": 60,
+      "ai": 71,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "strikebass.com",
+      "industry": "fishing guide",
+      "overall": 60,
+      "seo": 40,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "tablerocklakefishing.com",
+      "industry": "fishing guide",
+      "overall": 70,
+      "seo": 90,
+      "ai": 86,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "catchmofish.com",
+      "industry": "fishing guide",
+      "overall": 60,
+      "seo": 70,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "dodsonguideservice.com",
+      "industry": "fishing guide",
+      "overall": 100,
+      "seo": 100,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "dsfplumbing.com",
+      "industry": "plumber",
+      "overall": 90,
+      "seo": 90,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "allseasonscomfortsystems.com",
+      "industry": "hvac",
+      "overall": 75,
+      "seo": 70,
+      "ai": 71,
+      "geo": 75,
+      "status": "ok"
+    },
+    {
+      "url": "lorenzphac.com",
+      "industry": "hvac",
+      "overall": 100,
+      "seo": 100,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "patriotmo.com",
+      "industry": "hvac",
+      "overall": 45,
+      "seo": 70,
+      "ai": 100,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "delongplumbing.com",
+      "industry": "plumber",
+      "overall": 100,
+      "seo": 70,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    },
+    {
+      "url": "reedsplumbing.com",
+      "industry": "plumber",
+      "overall": 100,
+      "seo": 80,
+      "ai": 86,
+      "geo": 100,
+      "status": "ok"
+    }
+  ]
+}

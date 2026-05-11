@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "index.html",
+          "website-audit.html",
+          "industry-audit.html",
+          "both-audit.html",
+          "branson-report.html",
+          "pitch-deck.html",
+          "neo-club.html",
+          "neo-club.js",
+          "styles.css",
+          "script.js",
+          "robots.txt",
+          "sitemap.xml",
+          "og-image.png",
+          "services/**",
+          "data/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ]
+}
