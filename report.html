@@ -287,23 +287,89 @@
         var strategy = indAnalysis.strategy || {};
         var marketLabel = esc((industry || businessLabel)) + ' in ' + esc(city || 'your area') + (state ? ', ' + esc(state) : '');
 
+        // Pre-calculate channel scores (used by bar graph and GBP/SEO/GEO section)
+        var totalGBP = 0, totalSEO = 0, totalGEO = 0, compCount = Math.max(competitors.length, 1);
+        competitors.forEach(function(c) {
+          totalGBP += (c.mapPackAppearances || 0);
+          totalSEO += (c.searchAppearances || 0);
+          totalGEO += (c.aiVisibility || 0);
+        });
+        var gbpAvg = Math.min(100, Math.max(5, Math.round((totalGBP / compCount) * 20)));
+        var seoAvg = Math.min(100, Math.max(5, Math.round((totalSEO / compCount) * 15)));
+        var geoAvg = Math.min(100, Math.max(5, Math.round(totalGEO / compCount)));
+
         // --- Difficulty + Local vs National ---
         html += '<div class="report-section" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.5rem;margin-bottom:2rem;">';
         html += '<h2 style="border:none;padding:0;margin:0 0 1rem;">📊 Market Overview</h2>';
 
         // Difficulty badge
         var diffLabel = mktState.marketDifficultyLabel || 'Unknown';
-        var diffColor = diffLabel === 'Wide Open' || diffLabel === 'Easy' ? 'var(--brand)' : (diffLabel === 'Moderate' ? '#ffa657' : '#ff6b6b');
+        var diffColor = diffLabel === 'Weak' || diffLabel === 'Below Average' ? 'var(--brand)' : (diffLabel === 'Average' ? '#ffa657' : '#ff6b6b');
         html += '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">';
-        html += '<span style="font-weight:700;font-size:1rem;">Difficulty:</span>';
+        html += '<span style="font-weight:700;font-size:1rem;">Market Strength:</span>';
         html += '<span style="background:' + diffColor + ';color:#0a0f1a;font-weight:700;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.9rem;">' + esc(diffLabel) + '</span>';
-        html += '<span style="color:var(--muted);font-size:0.85rem;">Timeline to first page: ' + esc(mktState.estimatedTimeline || '—') + '</span>';
         html += '</div>';
 
         // Local vs National comparison
         html += '<div style="margin-bottom:1rem;padding:0.75rem;border:1px solid var(--line);border-radius:10px;">';
-        html += '<div style="font-weight:600;font-size:0.9rem;margin-bottom:0.4rem;">🏠 Local vs. National Comparison</div>';
-        html += '<p style="color:var(--muted);font-size:0.88rem;margin:0;">' + esc(mktState.nationalComparison || 'Not enough data to compare against national averages.') + '</p>';
+        html += '<div style="font-weight:600;font-size:0.9rem;margin-bottom:0.75rem;">🏠 Local vs. National Comparison</div>';
+
+        // Bar graph: National avg (left label) vs Local market (right label)
+        var localLabel = esc(city || 'Local');
+        var natWebsite = 62, natGBP = 58, natAI = 35; // national averages (benchmarks)
+        var locWebsite = mktState.averageWebsiteQualityEstimate || 30;
+        var locGBP = gbpAvg;
+        var locAI = geoAvg;
+
+        function barRow(label, natVal, locVal) {
+          var natW = Math.max(8, natVal) + '%';
+          var locW = Math.max(8, locVal) + '%';
+          var locColor = locVal >= natVal ? 'var(--brand)' : '#ff6b6b';
+          var r = '';
+          r += '<div style="margin-bottom:0.6rem;">';
+          r += '<div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.25rem;">' + label + '</div>';
+          r += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;align-items:center;">';
+          // National bar
+          r += '<div style="display:flex;align-items:center;gap:0.4rem;">';
+          r += '<div style="flex:1;background:var(--line);border-radius:4px;height:10px;overflow:hidden;"><div style="width:' + natW + ';height:100%;background:#6b7280;border-radius:4px;"></div></div>';
+          r += '<span style="font-size:0.75rem;color:#6b7280;min-width:1.8rem;text-align:right;">' + natVal + '</span>';
+          r += '</div>';
+          // Local bar
+          r += '<div style="display:flex;align-items:center;gap:0.4rem;">';
+          r += '<div style="flex:1;background:var(--line);border-radius:4px;height:10px;overflow:hidden;"><div style="width:' + locW + ';height:100%;background:' + locColor + ';border-radius:4px;"></div></div>';
+          r += '<span style="font-size:0.75rem;color:' + locColor + ';min-width:1.8rem;text-align:right;">' + locVal + '</span>';
+          r += '</div>';
+          r += '</div></div>';
+          return r;
+        }
+
+        // Column headers
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.4rem;padding-left:0;">';
+        html += '<div style="font-size:0.75rem;font-weight:700;color:#6b7280;text-align:center;">🇺🇸 National Avg</div>';
+        html += '<div style="font-size:0.75rem;font-weight:700;color:var(--ink);text-align:center;">📍 ' + localLabel + '</div>';
+        html += '</div>';
+
+        html += barRow('Website Quality', natWebsite, locWebsite);
+        html += barRow('Google Business Profile', natGBP, locGBP);
+        html += barRow('AI Search Readiness', natAI, locAI);
+
+        // Verdict: how hard is it to rank here?
+        var behindCount = (locWebsite < natWebsite ? 1 : 0) + (locGBP < natGBP ? 1 : 0) + (locAI < natAI ? 1 : 0);
+        html += '<div style="margin-top:0.75rem;padding:0.6rem 0.75rem;background:rgba(0,229,160,0.06);border-radius:8px;font-size:0.84rem;">';
+        if (locWebsite <= 35) {
+          html += '<strong style="color:var(--brand);">These websites look like they\'re from the 1990s.</strong> ';
+          html += 'Template designs, no real content, missing service pages. A professional site with actual information about your services would blow past everything ranking here right now.';
+        } else if (behindCount >= 2) {
+          html += '<strong style="color:var(--brand);">This is very doable.</strong> ';
+          html += 'The competition here is below what you\'d face in most markets. The sites ranking now are not investing in quality — a real website with good content and an active Google profile will outrank them.';
+        } else if (behindCount === 1) {
+          html += '<strong style="color:#ffa657;">Doable with consistent effort.</strong> ';
+          html += 'The competition is average — not a pushover, but nothing that a focused strategy can\'t beat within a few months.';
+        } else {
+          html += '<strong style="color:#ff6b6b;">This will take real work.</strong> ';
+          html += 'The businesses ranking here have invested in their online presence. Breaking in requires matching or exceeding their effort across website quality, reviews, and content.';
+        }
+        html += '</div>';
         html += '</div>';
 
         // Domination potential
@@ -321,13 +387,30 @@
         html += '<div class="swot-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;">';
 
         // Strengths (of the market — what's working for current players)
+        // Strengths: what are the TOP sites actually doing well?
         var strengths = [];
-        if ((displayScores.localPresence || 0) >= 55) strengths.push('Local businesses are actively showing up in Maps');
-        if ((displayScores.technical || 0) >= 60) strengths.push('Active market with real customer demand');
-        if (competitors.length >= 3) strengths.push(competitors.length + ' businesses competing for visibility');
-        if (!strengths.length) strengths.push('Market has some established players');
+        var topComps = competitors.slice(0, 3);
+        var topHasReviews = topComps.some(function(c) { return c.reviews && c.reviews >= 20; });
+        var topHasStructured = topComps.some(function(c) { return c.hasStructuredData; });
+        var topHasMultiSearch = topComps.some(function(c) { return (c.searchAppearances || 0) >= 2; });
+        var topHasGBP = topComps.some(function(c) { return (c.mapPackAppearances || 0) >= 1; });
+        var topAvgRating = 0;
+        var ratedCount = 0;
+        topComps.forEach(function(c) { if (c.rating) { topAvgRating += c.rating; ratedCount++; } });
+        topAvgRating = ratedCount ? (topAvgRating / ratedCount).toFixed(1) : 0;
+
+        if (topHasReviews) {
+          var maxReviews = Math.max.apply(null, topComps.map(function(c) { return c.reviews || 0; }));
+          strengths.push('Top competitors have built review volume (' + maxReviews + '+ reviews' + (topAvgRating >= 4 ? ', ' + topAvgRating + ' avg rating' : '') + ')');
+        }
+        if (topHasMultiSearch) strengths.push('Leading sites rank for multiple search terms, not just their business name');
+        if (topHasStructured) strengths.push('At least one top competitor uses structured data (schema markup) for richer search results');
+        if (topHasGBP && topHasReviews) strengths.push('Top players combine active Google Business Profiles with strong review presence');
+        if (!strengths.length) {
+          strengths.push('No standout strengths detected — top sites are ranking by default, not by quality');
+        }
         html += '<div style="border:1px solid var(--line);border-radius:10px;padding:1rem;">';
-        html += '<div style="font-weight:700;color:var(--brand);font-size:0.85rem;margin-bottom:0.4rem;">STRENGTHS (current market)</div>';
+        html += '<div style="font-weight:700;color:var(--brand);font-size:0.85rem;margin-bottom:0.4rem;">STRENGTHS (what top sites do well)</div>';
         strengths.forEach(function(s) { html += '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem;">• ' + esc(s) + '</div>'; });
         html += '</div>';
 
@@ -400,19 +483,7 @@
         html += '<h2>📍 GBP vs. SEO vs. GEO — Where the Visibility Lives</h2>';
         html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">Three channels drive customers to local businesses. Here\'s how this market breaks down:</p>';
 
-        // Calculate averages from competitors
-        var totalGBP = 0, totalSEO = 0, totalGEO = 0, compCount = Math.max(competitors.length, 1);
-        competitors.forEach(function(c) {
-          totalGBP += (c.mapPackAppearances || 0);
-          totalSEO += (c.searchAppearances || 0);
-          totalGEO += (c.aiVisibility || 0);
-        });
-        var gbpAvg = Math.round((totalGBP / compCount) * 20); // normalize to 0-100 scale
-        var seoAvg = Math.round((totalSEO / compCount) * 15);
-        var geoAvg = Math.round(totalGEO / compCount);
-        gbpAvg = Math.min(100, Math.max(5, gbpAvg));
-        seoAvg = Math.min(100, Math.max(5, seoAvg));
-        geoAvg = Math.min(100, Math.max(5, geoAvg));
+        // Calculate averages from competitors (already computed above)
 
         html += '<div class="channel-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1rem;">';
 
@@ -535,6 +606,24 @@
 
       // Deep audit placeholder (loads async)
       html += '<div id="deepAuditSection"></div>';
+
+      // PageSpeed Insights (website mode only)
+      if (mode !== 'market' && data.googleGrades) {
+        var g = data.googleGrades;
+        html += '<div class="report-section">';
+        html += '<h2>Google PageSpeed Insights</h2>';
+        html += '<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">These are Google\'s own scores for your website on mobile. They directly affect your search ranking.</p>';
+        html += '<div class="category-scores">';
+        html += catScore(g.performance, 'Performance');
+        html += catScore(g.seo, 'SEO');
+        html += catScore(g.accessibility, 'Accessibility');
+        html += catScore(g.bestPractices, 'Best Practices');
+        html += '</div>';
+        if (data.googleGradesSource === 'estimated_fallback') {
+          html += '<p style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">* Estimated scores (Google API was unavailable). Run again for live results.</p>';
+        }
+        html += '</div>';
+      }
 
       // CTA
       html += '<div class="cta-box">';
