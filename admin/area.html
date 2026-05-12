@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Branson Area | GeoNeo Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+    .toolbar { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+    .toolbar select, .toolbar input { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); padding: 0.5rem 0.7rem; border-radius: 8px; font-family: inherit; font-size: 0.85rem; }
+    .toolbar input { width: 180px; }
+    .toolbar .count { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+    .avg-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.5rem; margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .avg-box { text-align: center; }
+    .avg-box .val { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 700; }
+    .avg-box .val.good { color: var(--brand); }
+    .avg-box .val.ok { color: #ffa657; }
+    .avg-box .val.bad { color: #ff6b6b; }
+    .avg-box .lbl { font-size: 0.68rem; color: var(--muted); }
+    .biz-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+    .biz-row { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 0.8rem 1rem; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; align-items: center; cursor: pointer; transition: border-color 0.2s; font-size: 0.82rem; }
+    .biz-row:hover { border-color: var(--brand); }
+    .biz-row .name { font-weight: 600; font-size: 0.88rem; }
+    .biz-row .meta { color: var(--muted); font-size: 0.75rem; }
+    .biz-row .score { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; }
+    .biz-row .score.good { color: var(--brand); }
+    .biz-row .score.ok { color: #ffa657; }
+    .biz-row .score.bad { color: #ff6b6b; }
+    .biz-row .owner-badge { font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; }
+    .biz-row .owner-badge.pro { background: rgba(0,229,160,0.12); color: var(--brand); }
+    .biz-row .owner-badge.diy { background: rgba(255,166,87,0.12); color: #ffa657; }
+    .biz-row .owner-badge.local { background: rgba(56,189,248,0.12); color: #38bdf8; }
+    .biz-row .owner-badge.none { background: rgba(255,255,255,0.05); color: var(--muted); }
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
+    .modal-bg.show { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
+    .modal h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+    .modal .field { margin-bottom: 0.75rem; }
+    .modal .field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.2rem; }
+    .modal .field input, .modal .field select, .modal .field textarea { width: 100%; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); padding: 0.5rem; border-radius: 8px; font-family: inherit; font-size: 0.85rem; box-sizing: border-box; }
+    .modal .field textarea { min-height: 180px; white-space: pre-wrap; }
+    .modal .btn-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .modal .btn-row button { border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.82rem; }
+    .modal .btn-row .save { background: var(--brand); color: #0a0f1a; }
+    .modal .btn-row .cancel { background: var(--line); color: var(--ink); }
+    .modal .btn-row .copy { background: #38bdf8; color: #0a0f1a; }
+    .modal .scores-mini { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .modal .scores-mini span { font-size: 0.78rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="/admin/index.html"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
+    <a href="/admin/index.html" style="color:var(--muted);font-size:0.85rem;">← Back</a>
+  </header>
+  <main class="admin-wrap">
+    <h1 style="margin-bottom:0.5rem;">📍 Branson Area Businesses</h1>
+    <div class="toolbar">
+      <select id="industryFilter"><option value="">All Industries</option></select>
+      <select id="ownerFilter"><option value="">All SEO Types</option><option value="pro">Pro Agency</option><option value="diy">DIY</option><option value="local">Hired Local</option><option value="none">None/Unknown</option></select>
+      <input type="text" id="searchInput" placeholder="Search..." />
+      <span class="count" id="countLabel"></span>
+    </div>
+    <div class="avg-bar" id="avgBar"></div>
+    <div class="biz-grid" id="bizGrid"><p style="color:var(--muted)">Loading...</p></div>
+  </main>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal" id="modal"></div>
+  </div>
+
+  <script>
+  (function() {
+    var allBiz = [];
+    var NOTES_KEY = 'geoneo_biz_notes';
+    var grid = document.getElementById('bizGrid');
+    var avgBar = document.getElementById('avgBar');
+    var industryFilter = document.getElementById('industryFilter');
+    var ownerFilter = document.getElementById('ownerFilter');
+    var searchInput = document.getElementById('searchInput');
+    var countLabel = document.getElementById('countLabel');
+    var modalBg = document.getElementById('modalBg');
+    var modal = document.getElementById('modal');
+
+    fetch('/api/admin/audits')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var audits = data.audits || [];
+        // Filter to Branson area
+        allBiz = audits.filter(function(a) {
+          var loc = ((a.city||'') + ' ' + (a.market||'')).toLowerCase();
+          return loc.indexOf('branson') !== -1 || loc.indexOf('hollister') !== -1 || loc.indexOf('taney') !== -1 || loc.indexOf('ozark') !== -1;
+        }).map(function(a) {
+          return {
+            id: a.auditId || a.id || '',
+            name: a.businessName || a.company || a.website || '?',
+            website: a.website || '',
+            industry: a.industry || '',
+            city: a.city || '',
+            score: a.scores && a.scores.overall || 0,
+            seo: a.scores && a.scores.seo || 0,
+            geo: a.scores && a.scores.geo || 0,
+            ai: a.scores && a.scores.ai || 0,
+            date: (a.createdAt || '').slice(0, 10),
+            topFixes: a.topFixes || [],
+            owner: detectOwner(a),
+            raw: a
+          };
+        });
+
+        // Populate industry filter
+        var industries = [...new Set(allBiz.map(function(b) { return b.industry; }).filter(Boolean))].sort();
+        industries.forEach(function(ind) { industryFilter.innerHTML += '<option value="' + esc(ind) + '">' + esc(ind) + '</option>'; });
+
+        render(allBiz);
+      });
+
+    industryFilter.addEventListener('change', applyFilters);
+    ownerFilter.addEventListener('change', applyFilters);
+    searchInput.addEventListener('input', applyFilters);
+
+    function applyFilters() {
+      var ind = industryFilter.value.toLowerCase();
+      var own = ownerFilter.value;
+      var q = searchInput.value.toLowerCase();
+      var filtered = allBiz.filter(function(b) {
+        if (ind && b.industry.toLowerCase() !== ind) return false;
+        if (own && b.owner !== own) return false;
+        if (q && (b.name + ' ' + b.website + ' ' + b.industry).toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+      render(filtered);
+    }
+
+    function render(list) {
+      countLabel.textContent = list.length + ' businesses';
+      renderAverages(list);
+      if (!list.length) { grid.innerHTML = '<p style="color:var(--muted)">No businesses match.</p>'; return; }
+      grid.innerHTML = list.sort(function(a, b) { return a.score - b.score; }).map(function(b, i) {
+        var cls = b.score >= 70 ? 'good' : (b.score >= 45 ? 'ok' : 'bad');
+        var ownerCls = b.owner || 'none';
+        var ownerLabel = b.owner === 'pro' ? 'Pro' : (b.owner === 'diy' ? 'DIY' : (b.owner === 'local' ? 'Local' : '–'));
+        return '<div class="biz-row" data-idx="' + i + '">'
+          + '<div><div class="name">' + esc(b.name) + '</div><div class="meta">' + esc(b.website) + '</div></div>'
+          + '<div>' + esc(b.industry) + '</div>'
+          + '<div class="score ' + cls + '">' + b.score + '</div>'
+          + '<div><span class="owner-badge ' + ownerCls + '">' + ownerLabel + '</span></div>'
+          + '<div style="color:var(--muted)">' + b.date + '</div>'
+          + '</div>';
+      }).join('');
+
+      grid.querySelectorAll('.biz-row').forEach(function(row) {
+        row.addEventListener('click', function() { openModal(list[this.dataset.idx]); });
+      });
+    }
+
+    function renderAverages(list) {
+      if (!list.length) { avgBar.innerHTML = ''; return; }
+      var avg = function(key) { var vals = list.map(function(b) { return b[key]; }).filter(function(v) { return v > 0; }); return vals.length ? Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length) : 0; };
+      var proCount = list.filter(function(b) { return b.owner === 'pro'; }).length;
+      var diyCount = list.filter(function(b) { return b.owner === 'diy'; }).length;
+      var localCount = list.filter(function(b) { return b.owner === 'local'; }).length;
+      var noneCount = list.filter(function(b) { return b.owner === 'none'; }).length;
+      avgBar.innerHTML = avgBox(avg('score'), 'Avg Score') + avgBox(avg('seo'), 'Avg SEO') + avgBox(avg('geo'), 'Avg Local') + avgBox(avg('ai'), 'Avg AI')
+        + '<div class="avg-box"><div class="val" style="font-size:0.9rem;color:var(--brand)">' + proCount + '</div><div class="lbl">Pro</div></div>'
+        + '<div class="avg-box"><div class="val" style="font-size:0.9rem;color:#ffa657">' + diyCount + '</div><div class="lbl">DIY</div></div>'
+        + '<div class="avg-box"><div class="val" style="font-size:0.9rem;color:#38bdf8">' + localCount + '</div><div class="lbl">Hired Local</div></div>'
+        + '<div class="avg-box"><div class="val" style="font-size:0.9rem;color:var(--muted)">' + noneCount + '</div><div class="lbl">None</div></div>';
+    }
+
+    function avgBox(val, label) {
+      var cls = val >= 70 ? 'good' : (val >= 45 ? 'ok' : 'bad');
+      return '<div class="avg-box"><div class="val ' + cls + '">' + val + '</div><div class="lbl">' + label + '</div></div>';
+    }
+
+    function openModal(biz) {
+      var notes = getNotes(biz.id);
+      var email = buildEmail(biz, notes);
+      modal.innerHTML = '<h2>' + esc(biz.name) + '</h2>'
+        + '<div class="scores-mini"><span>Overall: ' + biz.score + '</span><span>SEO: ' + biz.seo + '</span><span>Local: ' + biz.geo + '</span><span>AI: ' + biz.ai + '</span><span>Owner: ' + (biz.owner || 'none') + '</span></div>'
+        + '<div class="field"><label>Website</label><input id="m-website" value="' + esc(biz.website) + '" /></div>'
+        + '<div class="field"><label>Industry</label><input id="m-industry" value="' + esc(biz.industry) + '" /></div>'
+        + '<div class="field"><label>SEO Done By</label><select id="m-owner"><option value="none"' + (biz.owner==='none'?' selected':'') + '>None/Unknown</option><option value="pro"' + (biz.owner==='pro'?' selected':'') + '>Pro Agency</option><option value="diy"' + (biz.owner==='diy'?' selected':'') + '>DIY</option><option value="local"' + (biz.owner==='local'?' selected':'') + '>Hired Local</option></select></div>'
+        + '<div class="field"><label>Contact Name</label><input id="m-contact" value="' + esc(notes.contact || '') + '" /></div>'
+        + '<div class="field"><label>Contact Email</label><input id="m-email" value="' + esc(notes.email || biz.raw.businessEmail || biz.raw.email || '') + '" /></div>'
+        + '<div class="field"><label>Notes</label><input id="m-notes" value="' + esc(notes.notes || '') + '" /></div>'
+        + '<div class="field"><label>Outreach Email (edit before sending)</label><textarea id="m-emailBody">' + esc(email) + '</textarea></div>'
+        + '<div class="btn-row"><button class="save" id="m-save">💾 Save</button><button class="copy" id="m-copy">📋 Copy Email</button><button class="cancel" id="m-cancel">Close</button><a href="/admin/business.html?url=' + encodeURIComponent(biz.website) + '&industry=' + encodeURIComponent(biz.industry) + '&city=' + encodeURIComponent(biz.city) + '" style="padding:0.5rem 1rem;font-size:0.82rem;color:var(--brand);">Full Deep View →</a></div>';
+
+      modalBg.classList.add('show');
+
+      document.getElementById('m-save').addEventListener('click', function() {
+        saveNotes(biz.id, {
+          contact: document.getElementById('m-contact').value,
+          email: document.getElementById('m-email').value,
+          notes: document.getElementById('m-notes').value,
+          owner: document.getElementById('m-owner').value,
+          emailBody: document.getElementById('m-emailBody').value
+        });
+        // Update local data
+        biz.owner = document.getElementById('m-owner').value;
+        applyFilters();
+        alert('Saved!');
+      });
+      document.getElementById('m-copy').addEventListener('click', function() {
+        navigator.clipboard.writeText(document.getElementById('m-emailBody').value);
+        this.textContent = '✓ Copied!';
+      });
+      document.getElementById('m-cancel').addEventListener('click', function() { modalBg.classList.remove('show'); });
+    }
+
+    modalBg.addEventListener('click', function(e) { if (e.target === modalBg) modalBg.classList.remove('show'); });
+
+    function buildEmail(biz, notes) {
+      var name = notes.contact || biz.name;
+      return 'Subject: Free visibility audit for ' + biz.name + ' — ' + biz.score + '/100\n\n'
+        + 'Hi ' + name + ',\n\n'
+        + 'I was researching ' + (biz.industry || 'businesses') + ' in Branson and ran a free visibility audit on your website (' + biz.website + ').\n\n'
+        + '📊 YOUR SCORE: ' + biz.score + '/100\n\n'
+        + '🔍 TOP ISSUES:\n' + (biz.topFixes.length ? biz.topFixes.slice(0,3).map(function(f,i){return (i+1)+'. '+f;}).join('\n') : '1. Visibility issues found\n2. Missing local signals\n3. Not optimized for AI search')
+        + '\n\n🏆 YOUR COMPETITION:\nOther ' + (biz.industry || '') + ' businesses in Branson are outranking you in Google Search, Maps, and AI recommendations.\n\n'
+        + '💰 ESTIMATED IMPACT:\nBased on your industry, these issues are likely costing you customers every month.\n\n'
+        + '---\n\n'
+        + 'I\'d be happy to send you the full detailed report — no cost, no strings.\n\nWant me to send it over?\n\n'
+        + 'Best,\nMatt\nGeoNeo AI\nhello@geoneo.ai';
+    }
+
+    function detectOwner(audit) {
+      // Heuristic: detect if site was built by pro, DIY, or local
+      var site = (audit.website || '').toLowerCase();
+      var checks = audit.fullAuditResult?.checks || audit.customerResult?.checks || [];
+      var passCount = checks.filter(function(c) { return c && c.status === 'PASS'; }).length;
+      var score = audit.scores && audit.scores.overall || 0;
+      var hasSchema = checks.some(function(c) { return c && c.key === 'structured-data' && c.status === 'PASS'; });
+      var hasSitemap = checks.some(function(c) { return c && c.key === 'sitemap' && c.status === 'PASS'; });
+
+      // Pro signals: high score + schema + sitemap + good structure
+      if (score >= 75 && hasSchema && hasSitemap) return 'pro';
+      // DIY signals: wix, squarespace, weebly, godaddy in URL or low score with some effort
+      if (/wix|squarespace|weebly|godaddy|wordpress\.com|site123/.test(site)) return 'diy';
+      // Local hire: moderate score, has some basics but missing advanced
+      if (score >= 45 && score < 75 && (hasSitemap || hasSchema)) return 'local';
+      // None: very low score, no technical signals
+      if (score < 45) return 'none';
+      return 'none';
+    }
+
+    function getNotes(id) {
+      var all = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      return all[id] || {};
+    }
+    function saveNotes(id, data) {
+      var all = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      all[id] = data;
+      localStorage.setItem(NOTES_KEY, JSON.stringify(all));
+    }
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  })();
+  </script>
+</body>
+</html>
