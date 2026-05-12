@@ -1,0 +1,403 @@
+{
+  "market": "Branson, MO",
+  "industry": "Towing",
+  "lastUpdated": "2026-05-11T06:25:34.268Z",
+  "totalBusinesses": 7,
+  "auditedCount": 7,
+  "unreachableCount": 0,
+  "averageScore": 66,
+  "summary": {
+    "avgWebsiteQuality": 62,
+    "withSchema": 4,
+    "withSSL": 5,
+    "withMobileViewport": 7,
+    "withServicePages": 5,
+    "withReviews": 6,
+    "withContactForm": 0,
+    "withSitemap": 5,
+    "avgWordCount": 3610,
+    "platforms": {
+      "Google Sites": 1,
+      "WordPress": 3,
+      "Unknown/Custom": 1,
+      "Squarespace": 1,
+      "Wix": 1
+    },
+    "grammarIssuesFound": 6
+  },
+  "businesses": [
+    {
+      "name": "Crawford's Automotive & Towing",
+      "url": "https://www.crawfordsautomotiveandtowing.com",
+      "finalUrl": "https://www.crawfordsautomotiveandtowing.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:24.151Z",
+      "score": 63,
+      "analysis": {
+        "hasTitle": false,
+        "title": "\r\n    Car Repair &amp; Recovery | Branson, MO | Crawford's Automotive &amp; Towing\r\n  ",
+        "hasMetaDescription": true,
+        "metaDescription": "Crawford",
+        "hasH1": true,
+        "h1Count": 2,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "1573532850",
+          "1177804290",
+          "1650471660"
+        ],
+        "hasAddress": false,
+        "hasSSL": true,
+        "wordCount": 3620,
+        "hasImages": 16,
+        "imagesWithAlt": 13,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 11,
+        "externalLinks": 3,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasEmergency": false,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": true,
+        "hasRobotsTxt": true,
+        "platform": "Google Sites",
+        "grammarIssues": [
+          "lowercase \"i\"",
+          "double punctuation",
+          "7 sentences not capitalized"
+        ]
+      },
+      "phone": [
+        "(417) 334-3888",
+        "(417) 336-1996"
+      ],
+      "email": [],
+      "address": "1919 Bee Creek Road, Branson, MO 65616"
+    },
+    {
+      "name": "Chris's Towing & Recovery",
+      "url": "https://chrisstowingrecovery.com",
+      "finalUrl": "https://chrisstowingrecovery.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:26.199Z",
+      "score": 82,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Chris&#039;s Towing &amp; Recovery - Branson West, MO",
+        "hasMetaDescription": true,
+        "metaDescription": "Based in Branson West, Missouri, Chris’s Towing is your locally trusted and reliable towing &amp; recovery service. We offer 24/7 roadside assistance and competitive pricing for all of our services. Our services include light, medium and heavy duty towing, tire changes, lockouts and more.",
+        "hasH1": true,
+        "h1Count": 1,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebPage",
+          "ReadAction",
+          "ImageObject",
+          "BreadcrumbList",
+          "ListItem",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "PropertyValueSpecification",
+          "Organization",
+          "ImageObject"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "8571428571",
+          "1749828109",
+          "1749828110"
+        ],
+        "hasAddress": false,
+        "hasSSL": true,
+        "wordCount": 4636,
+        "hasImages": 6,
+        "imagesWithAlt": 0,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "externalLinks": 1,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasEmergency": true,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": true,
+        "hasRobotsTxt": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "lowercase \"i\"",
+          "4 sentences not capitalized"
+        ]
+      },
+      "phone": [
+        "(417) 779-1484"
+      ],
+      "email": [],
+      "address": "Branson West, MO"
+    },
+    {
+      "name": "Davey's Auto Body Sales & Towing",
+      "url": "https://daveysautobody.com",
+      "finalUrl": "https://daveysautobody.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:27.735Z",
+      "score": 71,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Local Towing, Roadside & Auto Recovery - Harrison AR, US-65, US-412",
+        "hasMetaDescription": true,
+        "metaDescription": "24/7 towing company providing local towing, roadside assistance, heavy towing & heavy recovery in Harrison AR, on US-65 & US-412 in Boone Co. & Newton Co. Services includes roadside assistance, heavy duty towing, collision repair, off-road recovery, motorcycle towing, equipment hauling. 870-743-1172",
+        "hasH1": true,
+        "h1Count": 1,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "870-743-1172",
+          "3333333333",
+          "6666666667"
+        ],
+        "hasAddress": false,
+        "hasSSL": true,
+        "wordCount": 3510,
+        "hasImages": 22,
+        "imagesWithAlt": 6,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "externalLinks": 7,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasEmergency": false,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": true,
+        "hasRobotsTxt": false,
+        "platform": "Unknown/Custom",
+        "grammarIssues": [
+          "lowercase \"i\""
+        ]
+      },
+      "phone": [
+        "(870) 743-1172"
+      ],
+      "email": [
+        "daveystowing@gmail.com"
+      ],
+      "address": "Branson, MO"
+    },
+    {
+      "name": "Schrader's Towing",
+      "url": "http://schraderstowingmo.com",
+      "finalUrl": "http://schraderstowingmo.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:29.138Z",
+      "score": 60,
+      "analysis": {
+        "hasTitle": true,
+        "title": "SCHRADER&#039;S TOWING &#8211; Joplin, Neosho, Carthage, Springfield, Branson, Shell Knob Missouri",
+        "hasMetaDescription": false,
+        "metaDescription": "",
+        "hasH1": true,
+        "h1Count": 1,
+        "hasSchema": true,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "8571428571",
+          "729-7370584",
+          "1773280919"
+        ],
+        "hasAddress": false,
+        "hasSSL": false,
+        "wordCount": 4031,
+        "hasImages": 9,
+        "imagesWithAlt": 2,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "externalLinks": 1,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasEmergency": true,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": true,
+        "hasRobotsTxt": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "lowercase \"i\"",
+          "double punctuation",
+          "7 sentences not capitalized"
+        ]
+      },
+      "phone": [
+        "(417) 388-5343",
+        "(417) 540-3940"
+      ],
+      "email": [],
+      "address": "658 Walkington Ln, Branson, MO 65616"
+    },
+    {
+      "name": "Kinsley's Towing & Recovery",
+      "url": "https://www.kinsleystowing.net",
+      "finalUrl": "https://kinsleystowing.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:31:18.868Z",
+      "score": 45,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Towing Near Me | Kinsley's Towing & Recovery",
+        "hasMetaDescription": true,
+        "hasH1": false,
+        "hasSchema": false,
+        "hasPhone": false,
+        "hasSSL": true,
+        "wordCount": 721,
+        "hasImages": 1,
+        "hasMobileViewport": true,
+        "hasServicePages": false,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasContactForm": false,
+        "platform": "Unknown/Custom",
+        "grammarIssues": []
+      },
+      "phone": [
+        "(417) 243-9200"
+      ],
+      "email": [],
+      "address": "2331 State Highway 76, Branson, MO",
+      "note": "Real site is .net (the .com is a dead placeholder with 19 words)"
+    },
+    {
+      "name": "Affordable Towing - Branson",
+      "url": "http://www.affordabletowingservice.com",
+      "finalUrl": "http://www.affordabletowingservice.com",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:31.202Z",
+      "score": 69,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Towing Services in Springfield, MO | Affordable Towing",
+        "hasMetaDescription": true,
+        "metaDescription": "Affordable Towing offers roadside assistance, towing &amp; recovery in Springfield Bolivar, Joplin, Conway &amp; Branson, MO. Available 24/7! Call (888) 278-0805.",
+        "hasH1": true,
+        "h1Count": 1,
+        "hasSchema": true,
+        "schemaTypes": [
+          "Organization",
+          "ImageObject",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "WebPage",
+          "ReadAction",
+          "BreadcrumbList",
+          "ListItem",
+          "LocalBusiness",
+          "PostalAddress",
+          "GeoCoordinates"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "(888) 278-0805",
+          "(888) 278-0805",
+          "(888) 278-0805"
+        ],
+        "hasAddress": true,
+        "hasSSL": false,
+        "wordCount": 2192,
+        "hasImages": 8,
+        "imagesWithAlt": 0,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "externalLinks": 5,
+        "hasReviews": true,
+        "has24Hour": true,
+        "hasEmergency": false,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": true,
+        "hasRobotsTxt": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "lowercase \"i\"",
+          "double punctuation"
+        ]
+      },
+      "phone": [
+        "(417) 631-4675"
+      ],
+      "email": [],
+      "address": "5815 State Hwy 248, Branson, MO 65616"
+    },
+    {
+      "name": "Taney County Tire And Towing",
+      "url": "https://taneycountytireandtowing.com",
+      "finalUrl": "https://www.taneycountytire.com/",
+      "status": "audited",
+      "statusCode": 200,
+      "auditedAt": "2026-05-11T06:25:34.268Z",
+      "score": 73,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Taney County Tire | Auto Repair Service | 2105 State Hwy 248, Branson, MO, USA",
+        "hasMetaDescription": true,
+        "metaDescription": "Taney County Tire is locally owned and operated auto and tire service shop, serving the Branson community with honest, reliable, and fast service. Our skilled technicians are here to help you with everything from flat tire repairs and tire replacements to oil changes, brake work, alignments, and general maintenance. Offering fair prices, quality workmanship, and service you can count on.   Full-service auto repair &amp; maintenance,  Tire Repairs, Oil Changes, Walk-ins welcome.",
+        "hasH1": true,
+        "h1Count": 2,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebSite"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "2545352419",
+          "2545352419",
+          "2545352419"
+        ],
+        "hasAddress": true,
+        "hasSSL": true,
+        "wordCount": 7261,
+        "hasImages": 7,
+        "imagesWithAlt": 6,
+        "hasMobileViewport": true,
+        "hasServicePages": false,
+        "internalLinks": 0,
+        "externalLinks": 10,
+        "hasReviews": true,
+        "has24Hour": false,
+        "hasEmergency": true,
+        "hasPricing": true,
+        "hasContactForm": false,
+        "hasSitemap": false,
+        "hasRobotsTxt": false,
+        "platform": "Wix",
+        "grammarIssues": [
+          "lowercase \"i\"",
+          "double punctuation",
+          "3 sentences not capitalized"
+        ]
+      },
+      "phone": [
+        "(417) 239-0709"
+      ],
+      "email": [],
+      "address": "2105 State Hwy 248, Branson, MO 65616"
+    }
+  ]
+}

@@ -1,0 +1,429 @@
+{
+  "market": "Branson, MO",
+  "industry": "garage-door",
+  "lastUpdated": "2026-05-12T08:57:00.172Z",
+  "totalBusinesses": 8,
+  "auditedCount": 8,
+  "averageScore": 75,
+  "summary": {
+    "avgWebsiteQuality": 75,
+    "withSchema": 5,
+    "withSSL": 8,
+    "withMobileViewport": 8,
+    "withReviews": 8,
+    "withContactForm": 4,
+    "avgWordCount": 8362,
+    "platforms": {
+      "WordPress": 3,
+      "Weebly": 1,
+      "Unknown/Custom": 3,
+      "GoDaddy": 1
+    }
+  },
+  "businesses": [
+    {
+      "name": "Garage Door Guy",
+      "url": "https://mygaragedoorguy.com/branson/",
+      "finalUrl": "https://mygaragedoorguy.com/branson/",
+      "phone": "1778184653",
+      "email": "garagedoorguyonline@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 78,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Garage Door Guy Branson",
+        "hasMetaDescription": true,
+        "metaDescription": "Garage Door Guy now services the Table Rock area! At Garage Door Guy Branson, we repair garage doors and install new garage doors.",
+        "hasH1": true,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "1778184653",
+          "1778212181"
+        ],
+        "emails": [
+          "garagedoorguyonline@gmail.com"
+        ],
+        "hasAddress": true,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 3649,
+        "hasImages": 19,
+        "imagesWithAlt": 18,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "WordPress",
+        "grammarIssues": []
+      }
+    },
+    {
+      "name": "Kelly's Garage Door",
+      "url": "https://www.kellysgaragedoor.com/",
+      "finalUrl": "https://www.kellysgaragedoor.com/",
+      "phone": "3933176561",
+      "email": "kellygaragedoor@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 39,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Home | Reed Garage Doors LLC",
+        "hasMetaDescription": false,
+        "metaDescription": "",
+        "hasH1": false,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "3933176561",
+          "5010904420",
+          "5951870902",
+          "1220672624"
+        ],
+        "emails": [
+          "kellygaragedoor@gmail.com",
+          "hi@mystore.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 811,
+        "hasImages": 0,
+        "imagesWithAlt": 0,
+        "hasMobileViewport": true,
+        "hasServicePages": false,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Weebly",
+        "grammarIssues": [
+          "double punctuation"
+        ]
+      }
+    },
+    {
+      "name": "Precision Garage Door of Branson",
+      "url": "https://precisiondoorswmo.com/branson",
+      "finalUrl": "https://precisiondoorswmo.com/branson",
+      "phone": "3333333333",
+      "email": "",
+      "address": "",
+      "status": "audited",
+      "score": 86,
+      "analysis": {
+        "hasTitle": true,
+        "title": "\t\t\t\tPrecision Garage Doors of Southwest Missouri | Branson\t\t",
+        "hasMetaDescription": true,
+        "metaDescription": "\t\t\t\tPrecision Garage Door of Southwest Missouri provides garage doors and installation services to customers in the entire Southwest Missouri Area including Branson, Nixa, & Ozark. Shop for carriage house, custom, steel, and glass garage doors for your home. Discount Coupons\t\t",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "3333333333",
+          "6666666667"
+        ],
+        "emails": [],
+        "hasAddress": true,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 4486,
+        "hasImages": 213,
+        "imagesWithAlt": 212,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 184,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Unknown/Custom",
+        "grammarIssues": [
+          "11 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Ozarks Overhead Door & More",
+      "url": "https://ozarksoverheaddoor.com/",
+      "finalUrl": "https://www.ozarksoverheaddoor.com",
+      "phone": "6000000000",
+      "email": "service@ozarksoverheaddoor.com",
+      "address": "",
+      "status": "audited",
+      "score": 85,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Overhead Door Installation, Repair &amp; Maintenance in Springfield MO",
+        "hasMetaDescription": true,
+        "metaDescription": "Trusted garage door experts serving the Ozarks. We install, repair, and service residential &amp; commercial doors. 24/7 emergency service available.",
+        "hasH1": false,
+        "hasSchema": true,
+        "schemaTypes": [
+          "PostalAddress",
+          "OpeningHoursSpecification",
+          "OpeningHoursSpecification",
+          "OpeningHoursSpecification",
+          "City",
+          "City",
+          "City",
+          "City",
+          "City",
+          "City",
+          "AggregateRating"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "6000000000",
+          "4000000000",
+          "0600000000"
+        ],
+        "emails": [
+          "service@ozarksoverheaddoor.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 34667,
+        "hasImages": 17,
+        "imagesWithAlt": 9,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 22,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "Unknown/Custom",
+        "grammarIssues": []
+      }
+    },
+    {
+      "name": "Boone County Door",
+      "url": "https://boonecountydoor.com/",
+      "finalUrl": "https://boonecountydoor.com/",
+      "phone": "1692022576",
+      "email": "office@boonecountydoor.com",
+      "address": "",
+      "status": "audited",
+      "score": 85,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Garage Door Repair and Installation Company Near You in Harrison, AR and Branson, MO | Reliable Garage Door Repair | Best Garage Doors Near You | Seamless Garage Door Installation | Boone County Door",
+        "hasMetaDescription": true,
+        "metaDescription": "In need of expert garage door services near you? Boone County Door is your premier garage door company near Harrison, AR and Branson, MO. We provide garage door repair, installation, and more! Contact us today!",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "Place",
+          "PostalAddress",
+          "PostalAddress",
+          "ImageObject",
+          "WebSite",
+          "SearchAction",
+          "ImageObject",
+          "Question",
+          "Answer",
+          "Question",
+          "Answer",
+          "Question",
+          "Answer",
+          "HomeAndConstructionBusiness",
+          "PostalAddress",
+          "Place",
+          "LocalBusiness",
+          "PostalAddress",
+          "Service",
+          "ServiceChannel",
+          "Place",
+          "PostalAddress",
+          "ContactPoint",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "ImageObject",
+          "Review",
+          "Product",
+          "AggregateRating",
+          "Person",
+          "Rating",
+          "Organization",
+          "WebSite"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1692022576",
+          "870-743-3667",
+          "1691555428"
+        ],
+        "emails": [
+          "office@boonecountydoor.com",
+          "chosen-sprite@2x.png"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 7739,
+        "hasImages": 75,
+        "imagesWithAlt": 69,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 12,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "double punctuation",
+          "5 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "3S Garage Door Service",
+      "url": "https://3sgaragedoorservice.com/",
+      "finalUrl": "https://3sgaragedoorservice.com/",
+      "phone": "7662337662",
+      "email": "3Sgaragedoorservice@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 73,
+      "analysis": {
+        "hasTitle": true,
+        "title": "3S Garage Door Service LLC. - Home",
+        "hasMetaDescription": true,
+        "metaDescription": "Installation and repair, garage doors",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "LocalBusiness",
+          "PostalAddress",
+          "GeoCoordinates",
+          "OpeningHoursSpecification",
+          "OpeningHoursSpecification"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "7662337662",
+          "7142857142",
+          "3333333333"
+        ],
+        "emails": [
+          "3Sgaragedoorservice@gmail.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 3512,
+        "hasImages": 5,
+        "imagesWithAlt": 0,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 19,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "GoDaddy",
+        "grammarIssues": [
+          "6 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "NWA Garage Doors",
+      "url": "https://garagedoorsofnwa.com/garage-door-repair-branson-mo",
+      "finalUrl": "https://garagedoorsofnwa.com/garage-door-repair-branson-mo",
+      "phone": "(479) 366-8746",
+      "email": "dsells78@hotmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 69,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Garage Door Repair Services in Branson, MO | NWA Garage Doors",
+        "hasMetaDescription": true,
+        "metaDescription": "Trust NWA Garage Doors for expert garage door repair in Branson, MO. Fast, reliable service to keep your door safe and functional!",
+        "hasH1": true,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": true,
+        "phones": [
+          "(479) 366-8746",
+          "7236394169"
+        ],
+        "emails": [
+          "dsells78@hotmail.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 10515,
+        "hasImages": 38,
+        "imagesWithAlt": 8,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 3,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Unknown/Custom",
+        "grammarIssues": []
+      }
+    },
+    {
+      "name": "Access Garage Doors",
+      "url": "https://accessdoorcompany.com/springfield-mo/branson-garage-door-company/",
+      "finalUrl": "https://accessdoorcompany.com/springfield-mo/branson-garage-door-company/",
+      "phone": "1763038175",
+      "email": "919socialmedia@919marketing.com",
+      "address": "",
+      "status": "audited",
+      "score": 81,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Branson Garage Door Company",
+        "hasMetaDescription": true,
+        "metaDescription": "Access Garage Doors is proud to be Branson’s trusted experts for garage doors, overhead doors, and electric openers. Count on us for professional installation and reliable repairs.",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebPage",
+          "ReadAction",
+          "BreadcrumbList",
+          "ListItem",
+          "ListItem",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "PropertyValueSpecification"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1763038175",
+          "6666666667",
+          "3333333333"
+        ],
+        "emails": [
+          "919socialmedia@919marketing.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 1516,
+        "hasImages": 10,
+        "imagesWithAlt": 8,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "WordPress",
+        "grammarIssues": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Audits | GeoNeo Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+    .toolbar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+    .toolbar input { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); padding: 0.5rem 0.8rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; width: 250px; }
+    .toolbar .count { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+    .audit-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .audit-row { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 1rem 1.2rem; display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: center; }
+    .audit-row .info h4 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+    .audit-row .info .meta { color: var(--muted); font-size: 0.78rem; }
+    .audit-row .info .meta span { margin-right: 1rem; }
+    .audit-row .score { font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 700; min-width: 45px; text-align: center; }
+    .audit-row .score.good { color: var(--brand); }
+    .audit-row .score.ok { color: #ffa657; }
+    .audit-row .score.bad { color: #ff6b6b; }
+    .audit-row .actions { display: flex; gap: 0.4rem; }
+    .audit-row .actions a, .audit-row .actions button { border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 0.35rem 0.6rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-family: inherit; text-decoration: none; white-space: nowrap; }
+    .audit-row .actions button.send { background: var(--brand); color: #0a0f1a; border-color: var(--brand); font-weight: 600; }
+    .email-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+    .email-modal.show { display: flex; }
+    .email-modal .modal-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .email-modal pre { white-space: pre-wrap; font-size: 0.82rem; background: var(--bg); padding: 1rem; border-radius: 8px; }
+    .email-modal .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .email-modal .modal-actions button { border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; }
+    .email-modal .modal-actions .copy-btn { background: var(--brand); color: #0a0f1a; }
+    .email-modal .modal-actions .close-btn { background: var(--line); color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="/admin/"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
+    <a href="/admin/" style="color:var(--muted);font-size:0.85rem;">← Back</a>
+  </header>
+  <main class="admin-wrap">
+    <h1>📋 All Audits</h1>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search by business, URL, city..." />
+      <span class="count" id="countLabel"></span>
+    </div>
+    <div class="audit-list" id="auditList"><p style="color:var(--muted)">Loading...</p></div>
+  </main>
+
+  <div class="email-modal" id="emailModal">
+    <div class="modal-box">
+      <h3 id="emailModalTitle">Outreach Email</h3>
+      <pre id="emailContent"></pre>
+      <div class="modal-actions">
+        <button class="copy-btn" id="copyEmailBtn">📋 Copy to Clipboard</button>
+        <button class="close-btn" id="closeEmailBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var allAudits = [];
+    var listEl = document.getElementById('auditList');
+    var searchEl = document.getElementById('searchInput');
+    var countEl = document.getElementById('countLabel');
+    var modal = document.getElementById('emailModal');
+
+    fetch('/api/admin/audits')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        allAudits = data.audits || [];
+        render(allAudits);
+      })
+      .catch(function() { listEl.innerHTML = '<p style="color:#ff6b6b">Failed to load audits.</p>'; });
+
+    searchEl.addEventListener('input', function() {
+      var q = this.value.toLowerCase();
+      var filtered = allAudits.filter(function(a) {
+        var hay = [a.businessName, a.company, a.website, a.city, a.state, a.industry, a.email].join(' ').toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+      render(filtered);
+    });
+
+    function render(audits) {
+      countEl.textContent = audits.length + ' audits';
+      if (!audits.length) { listEl.innerHTML = '<p style="color:var(--muted)">No audits found.</p>'; return; }
+      listEl.innerHTML = audits.sort(function(a, b) { return (b.createdAt || '').localeCompare(a.createdAt || ''); }).map(function(a, idx) {
+        var score = a.scores && a.scores.overall;
+        var cls = score >= 70 ? 'good' : (score >= 45 ? 'ok' : 'bad');
+        var name = a.businessName || a.company || a.website || 'Unknown';
+        var date = (a.createdAt || '').slice(0, 10);
+        return '<div class="audit-row"><div class="info"><h4>' + esc(name) + '</h4><div class="meta">'
+          + '<span>' + esc(a.website || '') + '</span>'
+          + '<span>' + esc([a.city, a.state].filter(Boolean).join(', ')) + '</span>'
+          + '<span>' + esc(a.industry || '') + '</span>'
+          + '<span>' + date + '</span>'
+          + '</div></div><div style="display:flex;align-items:center;gap:0.75rem;">'
+          + '<div class="score ' + cls + '">' + (score || '–') + '</div>'
+          + '<div class="actions">'
+          + '<a href="/admin/business.html?url=' + encodeURIComponent(a.website || '') + '&industry=' + encodeURIComponent(a.industry || '') + '&city=' + encodeURIComponent(a.city || '') + '&state=' + encodeURIComponent(a.state || '') + '">Deep View</a>'
+          + '<a href="/api/audit-report?id=' + encodeURIComponent(a.auditId || a.id || '') + '" target="_blank">Report</a>'
+          + '<button class="send" data-idx="' + idx + '">📧 Send Email</button>'
+          + '</div></div></div>';
+      }).join('');
+
+      listEl.querySelectorAll('button[data-idx]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var a = audits[this.getAttribute('data-idx')];
+          showEmailModal(a);
+        });
+      });
+    }
+
+    function showEmailModal(a) {
+      var name = a.businessName || a.company || 'there';
+      var score = a.scores && a.scores.overall || '?';
+      var website = a.website || '';
+      var city = a.city || 'your area';
+      var industry = a.industry || 'your industry';
+      var topFixes = (a.topFixes || []).slice(0, 3);
+      var fixList = topFixes.length ? topFixes.map(function(f, i) { return (i+1) + '. ' + f; }).join('\n') : '1. Technical issues reducing visibility\n2. Missing local signals\n3. Not optimized for AI search';
+
+      var email = 'Subject: Free visibility audit for ' + name + ' — ' + score + '/100\n\n'
+        + 'Hi,\n\n'
+        + 'I ran a free visibility audit on ' + website + ' and wanted to share what I found.\n\n'
+        + '📊 YOUR VISIBILITY SCORE: ' + score + '/100\n\n'
+        + '🔍 TOP ISSUES:\n' + fixList + '\n\n'
+        + '🏆 COMPETITION:\n'
+        + 'Other ' + industry + ' businesses in ' + city + ' are outranking you in Google Search and Maps. Customers searching for your services are finding them first.\n\n'
+        + '💰 ESTIMATED IMPACT:\n'
+        + 'Based on your industry and location, these issues are likely costing you leads every month that go to competitors instead.\n\n'
+        + '---\n\n'
+        + 'I can send you the full detailed report — no cost, no obligation. If you\'d like help fixing these issues, we offer that too.\n\n'
+        + 'Would you like to see the full report?\n\n'
+        + 'Best,\nMatt\nGeoNeo AI\nhello@geoneo.ai';
+
+      document.getElementById('emailContent').textContent = email;
+      document.getElementById('emailModalTitle').textContent = 'Email to: ' + name;
+      modal.classList.add('show');
+    }
+
+    document.getElementById('closeEmailBtn').addEventListener('click', function() { modal.classList.remove('show'); });
+    document.getElementById('copyEmailBtn').addEventListener('click', function() {
+      navigator.clipboard.writeText(document.getElementById('emailContent').textContent);
+      this.textContent = '✓ Copied!';
+      setTimeout(function() { document.getElementById('copyEmailBtn').textContent = '📋 Copy to Clipboard'; }, 2000);
+    });
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.classList.remove('show'); });
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GeoNeo Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+    .admin-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .nav-card { border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 1.5rem; text-decoration: none; color: var(--ink); transition: border-color 0.2s; }
+    .nav-card:hover { border-color: var(--brand); }
+    .nav-card h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+    .nav-card p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .nav-card .icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .quick-audit { margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .quick-audit h3 { margin: 0 0 0.75rem; }
+    .quick-audit form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .quick-audit input { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); padding: 0.6rem 0.8rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; flex: 1; min-width: 200px; }
+    .quick-audit button { border: none; background: var(--brand); color: #0a0f1a; font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-family: inherit; }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="/admin/"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
+  </header>
+  <main class="admin-wrap">
+    <h1>Admin Panel</h1>
+    <p style="color:var(--muted);">Internal tools — not visible to the public.</p>
+
+    <div class="admin-nav">
+      <a class="nav-card" href="/admin/audits.html">
+        <div class="icon">📋</div>
+        <h3>All Audits</h3>
+        <p>View every audit run, full internal data, send outreach emails to any business.</p>
+      </a>
+      <a class="nav-card" href="/admin/business.html">
+        <div class="icon">🔍</div>
+        <h3>Business Deep View</h3>
+        <p>Enter any URL — see full audit, ranking vs competition, deep analysis, revenue lost.</p>
+      </a>
+      <a class="nav-card" href="/admin/prospect.html">
+        <div class="icon">🎯</div>
+        <h3>Prospect Hunter</h3>
+        <p>Find businesses in an industry + area, auto-audit them, generate outreach emails.</p>
+      </a>
+      <a class="nav-card" href="/admin/leads">
+        <div class="icon">📊</div>
+        <h3>Leads Table</h3>
+        <p>Raw leads table sorted by priority (legacy view).</p>
+      </a>
+    </div>
+
+    <div class="quick-audit">
+      <h3>⚡ Quick Business Lookup</h3>
+      <form id="quickForm">
+        <input type="text" name="url" placeholder="Enter any website URL..." required />
+        <button type="submit">Deep Audit →</button>
+      </form>
+    </div>
+  </main>
+  <script>
+    document.getElementById('quickForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var url = new FormData(this).get('url').trim();
+      if (url) window.location.href = '/admin/business.html?url=' + encodeURIComponent(url);
+    });
+  </script>
+</body>
+</html>

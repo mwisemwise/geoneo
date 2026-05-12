@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Business Deep View | GeoNeo Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+    .input-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1.2rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .input-bar input { border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); padding: 0.6rem 0.8rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; }
+    .input-bar input[name="url"] { flex: 2; min-width: 200px; }
+    .input-bar input[name="industry"], .input-bar input[name="city"], .input-bar input[name="state"] { width: 120px; }
+    .input-bar button { border: none; background: var(--brand); color: #0a0f1a; font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-family: inherit; }
+    .status { padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.88rem; display: none; }
+    .status.active { display: block; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); }
+    .status.error { display: block; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: #ff6b6b; }
+    .section { margin-bottom: 2rem; }
+    .section h2 { font-size: 1.1rem; margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); }
+    .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin-bottom: 1.5rem; }
+    .score-box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem; text-align: center; }
+    .score-box .val { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700; }
+    .score-box .val.good { color: var(--brand); }
+    .score-box .val.ok { color: #ffa657; }
+    .score-box .val.bad { color: #ff6b6b; }
+    .score-box .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+    .check-list { list-style: none; padding: 0; margin: 0; }
+    .check-list li { padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }
+    .check-list .pass { color: var(--brand); }
+    .check-list .fix { color: #ff6b6b; }
+    .competitor-list { list-style: none; padding: 0; }
+    .competitor-list li { padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; display: flex; justify-content: space-between; }
+    .revenue-banner { background: rgba(255,166,87,0.08); border: 1px solid rgba(255,166,87,0.2); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem; }
+    .revenue-banner .amount { font-size: 1.4rem; font-weight: 700; color: #ffa657; }
+    .revenue-banner p { color: var(--muted); font-size: 0.85rem; margin: 0.3rem 0 0; }
+    .email-box { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; font-size: 0.82rem; white-space: pre-wrap; max-height: 300px; overflow-y: auto; margin-top: 0.75rem; }
+    .btn-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+    .btn-row button { border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.82rem; }
+    .btn-row .primary { background: var(--brand); color: #0a0f1a; }
+    .btn-row .secondary { background: var(--line); color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="site-header container">
+    <a class="brand" href="/admin/"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
+    <a href="/admin/" style="color:var(--muted);font-size:0.85rem;">← Back</a>
+  </header>
+  <main class="admin-wrap">
+    <h1>🔍 Business Deep View</h1>
+    <form class="input-bar" id="auditForm">
+      <input type="text" name="url" placeholder="Website URL" required />
+      <input type="text" name="industry" placeholder="Industry" />
+      <input type="text" name="city" placeholder="City" />
+      <input type="text" name="state" placeholder="ST" maxlength="2" />
+      <button type="submit">Run Full Audit</button>
+    </form>
+    <div class="status" id="status"></div>
+    <div id="results"></div>
+  </main>
+  <script>
+  (function() {
+    var form = document.getElementById('auditForm');
+    var statusEl = document.getElementById('status');
+    var resultsEl = document.getElementById('results');
+    var params = new URLSearchParams(window.location.search);
+
+    // Pre-fill from URL params
+    if (params.get('url')) form.url.value = params.get('url');
+    if (params.get('industry')) form.industry.value = params.get('industry');
+    if (params.get('city')) form.city.value = params.get('city');
+    if (params.get('state')) form.state.value = params.get('state');
+
+    // Auto-run if URL param present
+    if (params.get('url')) runAudit();
+
+    form.addEventListener('submit', function(e) { e.preventDefault(); runAudit(); });
+
+    function runAudit() {
+      var url = form.url.value.trim();
+      var industry = form.industry.value.trim();
+      var city = form.city.value.trim();
+      var state = form.state.value.trim();
+      if (!url) return;
+
+      statusEl.className = 'status active';
+      statusEl.textContent = 'Running full audit + deep analysis...';
+      resultsEl.innerHTML = '';
+
+      var p = new URLSearchParams({ url: url, industry: industry, city: city, state: state });
+      fetch('/api/admin/business?' + p.toString())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) { statusEl.className = 'status error'; statusEl.textContent = data.error; return; }
+          statusEl.style.display = 'none';
+          renderResults(data);
+        })
+        .catch(function(err) { statusEl.className = 'status error'; statusEl.textContent = err.message; });
+    }
+
+    function renderResults(data) {
+      var audit = data.audit || {};
+      var deep = data.deep || {};
+      var market = data.market || {};
+      var dollar = data.dollarLoss || {};
+      var html = '';
+
+      // Revenue lost banner
+      if (dollar.low || dollar.high) {
+        html += '<div class="revenue-banner"><div class="amount">💰 $' + dollar.low + '–$' + dollar.high + '/month in lost revenue</div><p>$' + (dollar.low*12) + '–$' + (dollar.high*12) + '/year going to competitors. Based on industry CPL and search position.</p></div>';
+      }
+
+      // Main scores
+      html += '<div class="score-grid">';
+      var scores = audit.scores || {};
+      html += scoreBox(scores.overall, 'Overall');
+      html += scoreBox(scores.seo, 'SEO');
+      html += scoreBox(scores.geo, 'Local/GEO');
+      html += scoreBox(scores.ai, 'AI Ready');
+      if (audit.googleGrades) {
+        html += scoreBox(audit.googleGrades.performance, 'PageSpeed');
+        html += scoreBox(audit.googleGrades.seo, 'Google SEO');
+        html += scoreBox(audit.googleGrades.accessibility, 'Access.');
+      }
+      html += '</div>';
+
+      // Deep audit scores
+      if (deep.sectionScores) {
+        html += '<div class="section"><h2>Deep Analysis Scores</h2><div class="score-grid">';
+        html += scoreBox(deep.sectionScores.nap, 'NAP');
+        html += scoreBox(deep.sectionScores.sitemap, 'Sitemap');
+        html += scoreBox(deep.sectionScores.images, 'Images');
+        html += scoreBox(deep.overallScore, 'Deep Overall');
+        html += '</div></div>';
+      }
+
+      // Ranking vs competition
+      if (market.competitors && market.competitors.length) {
+        html += '<div class="section"><h2>Ranking vs Competition</h2>';
+        html += '<ul class="competitor-list">';
+        market.competitors.slice(0, 10).forEach(function(c, i) {
+          var isSelf = c.domain && audit.finalUrl && audit.finalUrl.indexOf(c.domain) !== -1;
+          html += '<li' + (isSelf ? ' style="color:var(--brand);font-weight:600"' : '') + '><span>#' + (i+1) + ' ' + esc(c.companyName || c.domain) + '</span><span>' + (c.strengthScore || '–') + '/100</span></li>';
+        });
+        html += '</ul></div>';
+      }
+
+      // All checks
+      if (audit.checks && audit.checks.length) {
+        html += '<div class="section"><h2>All Checks (' + audit.checks.length + ')</h2><ul class="check-list">';
+        audit.checks.forEach(function(c) {
+          html += '<li><span class="' + (c.status === 'PASS' ? 'pass' : 'fix') + '">' + (c.status === 'PASS' ? '✓' : '✗') + '</span> ' + esc(c.message) + '</li>';
+        });
+        html += '</ul></div>';
+      }
+
+      // Deep findings with $$ 
+      if (deep.topFiveFindings && deep.topFiveFindings.length) {
+        html += '<div class="section"><h2>Deep Findings (with $$ impact)</h2><ul class="check-list">';
+        deep.topFiveFindings.forEach(function(f) {
+          var dollarText = f.dollarImpact ? ' (~$' + f.dollarImpact.monthly.low + '-$' + f.dollarImpact.monthly.high + '/mo)' : '';
+          html += '<li><span class="fix">✗</span> ' + esc(f.title) + ' <span style="color:#ffa657">' + dollarText + '</span></li>';
+        });
+        html += '</ul></div>';
+      }
+
+      // Send email section
+      html += '<div class="section"><h2>📧 Outreach Email</h2>';
+      html += '<div class="email-box" id="emailBox">' + esc(buildEmail(data)) + '</div>';
+      html += '<div class="btn-row"><button class="primary" id="copyBtn">📋 Copy Email</button><button class="secondary" id="jsonBtn">Export JSON</button></div></div>';
+
+      resultsEl.innerHTML = html;
+
+      document.getElementById('copyBtn').addEventListener('click', function() {
+        navigator.clipboard.writeText(document.getElementById('emailBox').textContent);
+        this.textContent = '✓ Copied!';
+      });
+      document.getElementById('jsonBtn').addEventListener('click', function() {
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'audit-' + (audit.finalUrl || 'export').replace(/[^a-z0-9]/gi, '-') + '.json';
+        a.click();
+      });
+    }
+
+    function buildEmail(data) {
+      var audit = data.audit || {};
+      var dollar = data.dollarLoss || {};
+      var name = audit.siteProfile && audit.siteProfile.businessName || form.url.value;
+      var score = audit.scores && audit.scores.overall || '?';
+      var fixes = (audit.topFixes || []).slice(0, 3);
+      var fixList = fixes.length ? fixes.map(function(f, i) { return (i+1) + '. ' + f; }).join('\n') : '1. Visibility issues found\n2. Missing local signals\n3. Not optimized for AI search';
+      var revLine = dollar.high ? '\n\n💰 ESTIMATED REVENUE IMPACT:\nBased on your industry and location, we estimate these issues are costing you approximately $' + dollar.low + '–$' + dollar.high + ' per month ($' + (dollar.low*12) + '–$' + (dollar.high*12) + '/year) in customers going to competitors.' : '';
+
+      return 'Subject: I ran a free visibility audit on your website — ' + score + '/100\n\n'
+        + 'Hi,\n\n'
+        + 'I was researching ' + (form.industry.value || 'businesses') + ' in ' + (form.city.value || 'your area') + ' and ran a free visibility audit on your website (' + form.url.value + ').\n\n'
+        + '📊 YOUR SCORE: ' + score + '/100\n\n'
+        + '🔍 TOP ISSUES:\n' + fixList
+        + revLine
+        + '\n\n🏆 YOUR COMPETITION:\nOther businesses in your area are outranking you in Google Search, Maps, and AI recommendations. When customers search for what you do, they\'re finding competitors first.\n\n'
+        + '---\n\n'
+        + 'I\'d be happy to send you the full detailed report — no cost, no strings attached.\n\nIf you\'d like help fixing these issues, we can do that too. Most fixes take 1-2 weeks and the results show up within 30 days.\n\n'
+        + 'Want me to send the full report?\n\n'
+        + 'Best,\nMatt\nGeoNeo AI\nhello@geoneo.ai';
+    }
+
+    function scoreBox(val, label) {
+      var v = Number(val) || 0;
+      var cls = v >= 70 ? 'good' : (v >= 45 ? 'ok' : 'bad');
+      return '<div class="score-box"><div class="val ' + cls + '">' + (val || '–') + '</div><div class="lbl">' + label + '</div></div>';
+    }
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  })();
+  </script>
+</body>
+</html>

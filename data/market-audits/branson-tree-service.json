@@ -1,0 +1,479 @@
+{
+  "market": "Branson, MO",
+  "industry": "tree-service",
+  "lastUpdated": "2026-05-12T08:56:45.378Z",
+  "totalBusinesses": 9,
+  "auditedCount": 9,
+  "averageScore": 74,
+  "summary": {
+    "avgWebsiteQuality": 74,
+    "withSchema": 8,
+    "withSSL": 9,
+    "withMobileViewport": 9,
+    "withReviews": 8,
+    "withContactForm": 3,
+    "avgWordCount": 3067,
+    "platforms": {
+      "Google Sites": 3,
+      "WordPress": 4,
+      "Wix": 1,
+      "Squarespace": 1
+    }
+  },
+  "businesses": [
+    {
+      "name": "Lakes Tree Service",
+      "url": "https://www.lakestreeservicemo.net/",
+      "finalUrl": "https://www.lakestreeservicemo.net/",
+      "phone": "1651162705",
+      "email": "lakestreeservice2016@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 78,
+      "analysis": {
+        "hasTitle": false,
+        "title": "\r\n    \n    Tree Service Experts in Branson, MO | Lakes Tree Service\n  \r\n  ",
+        "hasMetaDescription": true,
+        "metaDescription": "Turn to Lakes Tree Service if you need tree service experts serving those in Branson, MO. Contact a member of our team today to learn more.",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebSite",
+          "LocalBusiness",
+          "PostalAddress",
+          "GeoCoordinates",
+          "OpeningHoursSpecification"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1651162705",
+          "1000000999",
+          "1000009999",
+          "1152656092",
+          "1553073821"
+        ],
+        "emails": [
+          "lakestreeservice2016@gmail.com"
+        ],
+        "hasAddress": true,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 3437,
+        "hasImages": 8,
+        "imagesWithAlt": 8,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 20,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Google Sites",
+        "grammarIssues": [
+          "double punctuation",
+          "7 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Benoit's Tree Care",
+      "url": "https://www.benoittreecare.com/",
+      "finalUrl": "https://www.benoittreecare.com/",
+      "phone": "1775506701",
+      "email": "robbyjoebenoit@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 81,
+      "analysis": {
+        "hasTitle": true,
+        "title": "\r\n    \n    Tree Care Services | Benoit's Tree Care | Kirbyville &amp; Branson, MO\n  \r\n  ",
+        "hasMetaDescription": true,
+        "metaDescription": "Get expert tree care in Taney Co. with pruning, removal, stump grinding &amp; more. Contact us for a free estimate today!",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebSite",
+          "ProfessionalService",
+          "PostalAddress",
+          "GeoCoordinates",
+          "OpeningHoursSpecification"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1775506701",
+          "1553834214",
+          "1881224593",
+          "1190549450"
+        ],
+        "emails": [
+          "robbyjoebenoit@gmail.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 3968,
+        "hasImages": 4,
+        "imagesWithAlt": 4,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 33,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Google Sites",
+        "grammarIssues": [
+          "double punctuation",
+          "8 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Ryan Lawn & Tree",
+      "url": "https://ryanlawn.com/branson-tree-service/",
+      "finalUrl": "https://branson.ryanlawn.com/services/tree-plant-care/",
+      "phone": "1777562684",
+      "email": "",
+      "address": "",
+      "status": "audited",
+      "score": 86,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Branson Tree &amp; Plant Care | Certified Arborists",
+        "hasMetaDescription": true,
+        "metaDescription": "Enhance your landscape with Branson tree and plant care services. From pruning to pest control, keep your plants healthy and thriving.",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "CollectionPage",
+          "ImageObject",
+          "BreadcrumbList",
+          "ListItem",
+          "ListItem",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "PropertyValueSpecification",
+          "Organization",
+          "ImageObject"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1777562684"
+        ],
+        "emails": [],
+        "hasAddress": true,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 2806,
+        "hasImages": 28,
+        "imagesWithAlt": 6,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 10,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "4 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Hansen's Tree Service",
+      "url": "https://www.hansenstree.com/branson-mo/",
+      "finalUrl": "https://www.hansenstree.com/branson-mo/",
+      "phone": "1176536082",
+      "email": "info@hansenstree.com",
+      "address": "",
+      "status": "audited",
+      "score": 85,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Hansen&#039;s Tree Service | Branson, MO",
+        "hasMetaDescription": true,
+        "metaDescription": "Hansen&#039;s Tree Service in Branson, MO provides a variety of services including: Tree Trimming, Tree Cutting, Tree Removal, Tree Care, Green Resource Recycling, Landscape Mulch, Stump Grinding, and Land Clearing. Our Service Areas include: Springfield, MO, Branson, MO, Nixa, MO, Ozark, MO, Republic, MO",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebPage",
+          "ReadAction",
+          "BreadcrumbList",
+          "ListItem",
+          "ListItem",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "PropertyValueSpecification",
+          "GeoCoordinates",
+          "OpeningHoursSpecification",
+          "OpeningHoursSpecification",
+          "OpeningHoursSpecification",
+          "PostalAddress",
+          "ImageObject"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1176536082",
+          "8106159328",
+          "7258758994",
+          "636.379.1830"
+        ],
+        "emails": [
+          "info@hansenstree.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 4430,
+        "hasImages": 18,
+        "imagesWithAlt": 13,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 16,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "double punctuation",
+          "3 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "A Cut Above Tree Service",
+      "url": "https://www.acutabovetreemo.com",
+      "finalUrl": "https://www.acutabovetreemo.com",
+      "phone": "2545352419",
+      "email": "",
+      "address": "",
+      "status": "audited",
+      "score": 68,
+      "analysis": {
+        "hasTitle": true,
+        "title": "A Cut Above Tree Service, LLC | tree service Branson | Branson West, MO, USA",
+        "hasMetaDescription": true,
+        "metaDescription": "A Cut Above Tree Service - We are your &quot;Go To",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebSite"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "2545352419"
+        ],
+        "emails": [],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 5453,
+        "hasImages": 10,
+        "imagesWithAlt": 7,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Wix",
+        "grammarIssues": [
+          "double punctuation",
+          "3 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Long's Tree Service",
+      "url": "https://www.longstreeservices.com/",
+      "finalUrl": "https://www.longstreeservices.com/",
+      "phone": "",
+      "email": "",
+      "address": "",
+      "status": "audited",
+      "score": 19,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Coming Soon",
+        "hasMetaDescription": false,
+        "metaDescription": "",
+        "hasH1": true,
+        "hasSchema": false,
+        "schemaTypes": [],
+        "hasPhone": false,
+        "phones": [],
+        "emails": [],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 19,
+        "hasImages": 2,
+        "imagesWithAlt": 0,
+        "hasMobileViewport": true,
+        "hasServicePages": false,
+        "internalLinks": 0,
+        "hasReviews": false,
+        "hasContactForm": false,
+        "platform": "Squarespace",
+        "grammarIssues": []
+      }
+    },
+    {
+      "name": "Pace Tree Service",
+      "url": "https://www.paceallamericantreeservice.com/",
+      "finalUrl": "https://www.paceallamericantreeservice.com/",
+      "phone": "1775497499",
+      "email": "holmeshsue@gmail.com",
+      "address": "",
+      "status": "audited",
+      "score": 81,
+      "analysis": {
+        "hasTitle": true,
+        "title": "\r\n    Tree Services | Pace Tree Service | Branson &amp; Ozark, MO\r\n  ",
+        "hasMetaDescription": true,
+        "metaDescription": "Pace Tree Service offers tree trimming, removal, stump grinding &amp; snow removal. Contact us for reliable service today!",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebSite",
+          "ProfessionalService",
+          "PostalAddress",
+          "GeoCoordinates",
+          "OpeningHoursSpecification"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1775497499",
+          "1000000999",
+          "1000009999",
+          "1569529526"
+        ],
+        "emails": [
+          "holmeshsue@gmail.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 3262,
+        "hasImages": 6,
+        "imagesWithAlt": 3,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 17,
+        "hasReviews": true,
+        "hasContactForm": false,
+        "platform": "Google Sites",
+        "grammarIssues": [
+          "double punctuation",
+          "7 uncapitalized sentences"
+        ]
+      }
+    },
+    {
+      "name": "Trufast Tree Service",
+      "url": "https://www.trufasttreeservice.com/branson-tree-services/",
+      "finalUrl": "https://www.trufasttreeservice.com/branson-tree-services/",
+      "phone": "1619717632",
+      "email": "info@trufasttreeservice.com",
+      "address": "",
+      "status": "audited",
+      "score": 85,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Professional Tree Trimming in Branson, MO - Trufast Tree Service",
+        "hasMetaDescription": true,
+        "metaDescription": "Trufast Tree Services offers tree trimming services to the Branson, MO and surrounding area. Request a free assessment for your tree today.",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "WebPage",
+          "ReadAction",
+          "ImageObject",
+          "BreadcrumbList",
+          "ListItem",
+          "ListItem",
+          "WebSite",
+          "SearchAction",
+          "EntryPoint",
+          "PropertyValueSpecification",
+          "Organization",
+          "ImageObject"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "1619717632",
+          "1777504950",
+          "1778102444",
+          "1778102445"
+        ],
+        "emails": [
+          "info@trufasttreeservice.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 1945,
+        "hasImages": 14,
+        "imagesWithAlt": 2,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 3,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "WordPress",
+        "grammarIssues": []
+      }
+    },
+    {
+      "name": "Branson Tree Removal",
+      "url": "https://bransontreeremoval.com/our-services/",
+      "finalUrl": "https://bransontreeremoval.com/our-services/",
+      "phone": "3529785855",
+      "email": "chad@bransontreeremoval.com",
+      "address": "",
+      "status": "audited",
+      "score": 80,
+      "analysis": {
+        "hasTitle": true,
+        "title": "Tree Services in Branson MO - Branson Tree Removal",
+        "hasMetaDescription": true,
+        "metaDescription": "Affordable Tree Services in Branson MO and Surrounding Areas. Tree trimming, tree removal and more. Get a free quote - see how much you save",
+        "hasH1": true,
+        "hasSchema": true,
+        "schemaTypes": [
+          "Place",
+          "GeoCoordinates",
+          "PostalAddress",
+          "PostalAddress",
+          "ImageObject",
+          "WebSite",
+          "ImageObject",
+          "WebPage",
+          "Person",
+          "ImageObject",
+          "Article"
+        ],
+        "hasPhone": true,
+        "phones": [
+          "3529785855",
+          "949-392-3538",
+          "(949)392-3538",
+          "217.8441453"
+        ],
+        "emails": [
+          "chad@bransontreeremoval.com"
+        ],
+        "hasAddress": false,
+        "addresses": [],
+        "hasSSL": true,
+        "wordCount": 2287,
+        "hasImages": 11,
+        "imagesWithAlt": 2,
+        "hasMobileViewport": true,
+        "hasServicePages": true,
+        "internalLinks": 0,
+        "hasReviews": true,
+        "hasContactForm": true,
+        "platform": "WordPress",
+        "grammarIssues": [
+          "misspellings"
+        ]
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const path = require('path');
 const { URL } = require('url');
 const {
@@ -1684,35 +1685,37 @@ function averageNumbers(values) {
 
 function difficultyBandFromScore(score) {
   const numeric = Number(score || 0);
-  if (numeric <= 20) return 'Wide Open';
-  if (numeric <= 38) return 'Easy';
-  if (numeric <= 60) return 'Moderate';
-  if (numeric <= 78) return 'Competitive';
-  return 'Highly Competitive';
+  if (numeric <= 25) return 'Weak';
+  if (numeric <= 42) return 'Below Average';
+  if (numeric <= 62) return 'Average';
+  if (numeric <= 80) return 'Strong';
+  return 'Very Strong';
 }
 
 function dominationPotentialFromSignals({ competitionLevel, directoryDominance, websiteQualityEstimate, localCompetitionDensity }) {
+  // When websites are weak and directories dominate, it's EASY to take over
+  // The old formula was too conservative — a market full of bad websites is wide open
   const score = clampScore(
     Math.round(
-      (100 - Number(competitionLevel || 0)) * 0.35
-      + Number(directoryDominance || 0) * 0.2
-      + (100 - Number(websiteQualityEstimate || 0)) * 0.25
-      + (100 - Number(localCompetitionDensity || 0)) * 0.2
+      (100 - Number(competitionLevel || 0)) * 0.25
+      + Number(directoryDominance || 0) * 0.25
+      + (100 - Number(websiteQualityEstimate || 0)) * 0.35
+      + (100 - Number(localCompetitionDensity || 0)) * 0.15
     ),
     0,
     100
   );
-  if (score >= 75) return 'Very High';
-  if (score >= 58) return 'High';
-  if (score >= 38) return 'Moderate';
+  if (score >= 68) return 'Very High';
+  if (score >= 52) return 'High';
+  if (score >= 35) return 'Moderate';
   return 'Low';
 }
 
 function dominationTimelineFromPotential(potential) {
-  if (potential === 'Very High') return '30–60 days';
-  if (potential === 'High') return '2–4 months';
-  if (potential === 'Moderate') return '4–8 months';
-  return '8–12+ months';
+  if (potential === 'Very High') return '30–60 days with a proper website';
+  if (potential === 'High') return '60–90 days with consistent effort';
+  if (potential === 'Moderate') return '3–5 months of focused work';
+  return '6–9 months against strong competition';
 }
 
 function buildExpandedMarketLabel({ city, state, zip }) {
@@ -1732,13 +1735,19 @@ function buildExpandedMarketLabel({ city, state, zip }) {
 
 function describeNationalComparison({ industry, websiteQualityEstimate, directoryDominance, competitionLevel }) {
   const label = normalizeString(industry) || 'local service';
-  if (Number(directoryDominance || 0) >= 45 && Number(websiteQualityEstimate || 0) <= 58) {
-    return `This ${label} market is weaker than national average. Most visible websites still rely on directory support and weak owned assets.`;
+  if (Number(websiteQualityEstimate || 0) <= 45) {
+    return `This ${label} market is far behind national average. The websites ranking here are low-quality — cheap templates, thin content, and no real SEO investment. A professional site with real content would stand out immediately.`;
   }
-  if (Number(competitionLevel || 0) >= 70 && Number(websiteQualityEstimate || 0) >= 68) {
-    return `This ${label} market is stronger than national average. The visible leaders show better structure, local proof, and authority than most local markets.`;
+  if (Number(directoryDominance || 0) >= 45 && Number(websiteQualityEstimate || 0) <= 60) {
+    return `This ${label} market is weaker than national average. Directories like Yelp and Angi are outranking actual businesses because the local websites are too weak to compete. That's a clear opening.`;
   }
-  return `This ${label} market looks close to national average. There is visible competition, but several ranking assets still show uneven authority and outdated structure.`;
+  if (Number(competitionLevel || 0) >= 70 && Number(websiteQualityEstimate || 0) >= 65) {
+    return `This ${label} market is stronger than national average. The visible leaders have invested in real websites, local proof, and authority. Breaking in requires matching or exceeding their effort.`;
+  }
+  if (Number(websiteQualityEstimate || 0) <= 55) {
+    return `This ${label} market is below national average. Most ranking websites show signs of low investment — template designs, missing service pages, and little content. A well-built site can move past them quickly.`;
+  }
+  return `This ${label} market is near national average. There is visible competition, but many ranking sites still have gaps in content, structure, and local proof that can be exploited.`;
 }
 
 function pickSelectedMarketClient({ businessName, competitors }) {
@@ -1979,10 +1988,17 @@ function createBusinessKey({ domain, companyName }) {
   return normalizeString(companyName).toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-function estimateWebsiteStrength({ domain, website }) {
-  if (!domain && !website) return 20;
-  if (hasDirectoryHost(domain)) return 25;
-  return 78;
+function estimateWebsiteStrength({ domain, website, searchAppearances, mapPackAppearances, hasStructuredData, contentSignal }) {
+  if (!domain && !website) return 15;
+  if (hasDirectoryHost(domain)) return 20;
+  // Without actually crawling, we estimate based on observable signals
+  // A site that only shows up once or twice with no structured data is likely weak
+  let score = 30; // base: unknown site, assume mediocre until proven otherwise
+  if (Number(searchAppearances || 0) >= 3) score += 15; // shows up repeatedly = some SEO effort
+  if (Number(mapPackAppearances || 0) >= 2) score += 10; // active GBP
+  if (hasStructuredData) score += 15; // actually invested in technical SEO
+  if (Number(contentSignal || 0) >= 3) score += 10; // has real content depth
+  return clampScore(score, 15, 85);
 }
 
 function estimateLocalPresence({ signalCount, reviews, areaMatch }) {
@@ -2100,7 +2116,7 @@ function upsertMarketCompetitor({
   row.snippetsSeen = [...new Set(row.snippetsSeen.concat(normalizeString(entry.snippet)))].filter(Boolean).slice(0, 6);
   row.localSignalCount = Math.max(row.localSignalCount, evaluation.signalCount);
   row.areaMatch = row.areaMatch || evaluation.businessSignals.areaMention || evaluation.businessSignals.nearbyMention;
-  row.websiteStrength = Math.max(row.websiteStrength, estimateWebsiteStrength({ domain, website }));
+  row.websiteStrength = Math.max(row.websiteStrength, estimateWebsiteStrength({ domain, website, searchAppearances: row.searchAppearances, mapPackAppearances: row.mapPackAppearances, hasStructuredData: row.hasStructuredData, contentSignal: row.contentSignal }));
   row.conversionUx = Math.max(row.conversionUx, estimateConversionUx({ title: companyName, snippet: entry.snippet }));
   row.aiVisibility = Math.max(row.aiVisibility, estimateAiVisibility({
     hasStructuredData: row.hasStructuredData,
@@ -2497,11 +2513,7 @@ async function runMarketOnlyAudit(input, { provider: injectedProvider } = {}) {
       rating: Number.isFinite(Number(item.rating)) ? Number(item.rating) : null,
       reviews: Number.isFinite(Number(item.reviews)) ? Number(item.reviews) : null,
       reputationScore: item.reputationScore === null ? null : Number(item.reputationScore || 0),
-      websiteStrength: Number(item.websiteStrength || 0),
-      localPresence: Number(item.localPresence || 0),
-      conversionUx: Number(item.conversionUx || 0),
-      aiVisibility: Number(item.aiVisibility || 0),
-      strengthScore
+      websiteStrength: estimateWebsiteStrength({ domain: item.domain, website: item.website, searchAppearances: Number(item.searchAppearances || 0), mapPackAppearances: Number(item.mapPackAppearances || 0), hasStructuredData: Boolean(item.hasStructuredData), contentSignal: Number(item.contentSignal || 0) }),
     };
   });
   const competitorStatsByKey = new Map(
@@ -5490,6 +5502,15 @@ function sendJson(res, statusCode, data) {
   res.end(JSON.stringify(data));
 }
 
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString()));
+    req.on('error', reject);
+  });
+}
+
 function isLocalRequest(req) {
   const remote = (req.socket && req.socket.remoteAddress) || '';
   return remote === '127.0.0.1'
@@ -5976,6 +5997,64 @@ async function requestHandler(req, res) {
     return;
   }
 
+  if (reqUrl.pathname === '/api/admin/audits' && req.method === 'GET') {
+    if (!isLocalRequest(req)) { res.writeHead(403); res.end('Forbidden'); return; }
+    try {
+      const records = await loadAuditRecords();
+      sendJson(res, 200, { ok: true, audits: records });
+    } catch (error) { sendJson(res, 500, { error: error.message }); }
+    return;
+  }
+
+  if (reqUrl.pathname === '/api/admin/business' && req.method === 'GET') {
+    if (!isLocalRequest(req)) { res.writeHead(403); res.end('Forbidden'); return; }
+    try {
+      const targetUrl = reqUrl.searchParams.get('url') || '';
+      const industry = normalizeString(reqUrl.searchParams.get('industry') || '');
+      const city = normalizeString(reqUrl.searchParams.get('city') || '');
+      const state = normalizeString(reqUrl.searchParams.get('state') || '');
+      if (!targetUrl) { sendJson(res, 400, { error: 'url is required.' }); return; }
+
+      // Run full website audit
+      const auditResult = await runAudit(targetUrl, { market: [city, state].filter(Boolean).join(', '), industry, city, state });
+
+      // Run deep audit
+      const { runDeepAudit } = require('./services/auditDeep');
+      const { estimateSpecificLoss } = require('./services/dollarLiftEngine');
+      const parsed = safeUrl(targetUrl);
+      const [sitemapRes, robotsRes] = await Promise.all([
+        fetch(`${parsed.origin}/sitemap.xml`, { redirect: 'follow' }).catch(() => null),
+        fetch(`${parsed.origin}/robots.txt`, { redirect: 'follow' }).catch(() => null)
+      ]);
+      const sitemapXml = sitemapRes && sitemapRes.ok ? await sitemapRes.text() : null;
+      const robotsTxt = robotsRes && robotsRes.ok ? await robotsRes.text() : '';
+      const pageRes = await fetch(auditResult.finalUrl || parsed.toString(), { redirect: 'follow', headers: { 'User-Agent': 'GeoNeo-DeepAudit/1.0' } }).catch(() => null);
+      const html = pageRes && pageRes.ok ? await pageRes.text() : '';
+      const deepResult = await runDeepAudit({ html, finalUrl: auditResult.finalUrl, robotsTxt, sitemapXml, industry, city, state, businessFacts: { businessName: auditResult.siteProfile?.businessName } });
+
+      // Run market context
+      let marketResult = null;
+      if (industry && city) {
+        try { marketResult = await runMarketOnlyAudit({ industry, city, state }); } catch {}
+      }
+
+      // Dollar loss
+      const localSummary = auditResult.localSearchVisibility?.summary || {};
+      const dollarLoss = estimateSpecificLoss({ industry, city, missingFromQueries: localSummary.missingCount || 4, totalQueriesTested: localSummary.totalQueries || 5, currentAvgPosition: 12 });
+
+      sendJson(res, 200, {
+        ok: true,
+        audit: auditResult,
+        deep: deepResult,
+        market: marketResult ? { competitors: marketResult.competitors, summaryScores: marketResult.summaryScores } : null,
+        dollarLoss: dollarLoss.monthlyDollarLoss
+      });
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Business audit failed.' });
+    }
+    return;
+  }
+
   if (reqUrl.pathname === '/api/admin/prospect' && req.method === 'GET') {
     if (!isLocalRequest(req)) { res.writeHead(403); res.end('Forbidden'); return; }
     try {
@@ -6018,6 +6097,156 @@ async function requestHandler(req, res) {
     } catch (error) {
       sendJson(res, 500, { error: error.message || 'Prospect discovery failed.' });
     }
+    return;
+  }
+
+  // ─── Admin API endpoints ───────────────────────────────────────────────────
+  if (reqUrl.pathname.startsWith('/api/admin/') || reqUrl.pathname.startsWith('/api/score') || reqUrl.pathname.startsWith('/api/leads') || reqUrl.pathname.startsWith('/api/pipeline') || reqUrl.pathname.startsWith('/api/fix-tracker') || reqUrl.pathname.startsWith('/api/member/') || reqUrl.pathname.startsWith('/api/competitors/')) {
+    if (!isLocalRequest(req)) { sendJson(res, 403, { error: 'Forbidden' }); return; }
+
+    const { loadAdminSummary } = require('./services/adminSummary');
+    const { calculateVisibilityScore } = require('./services/visibilityScoring');
+    const { recordScore, getHistoryForDomain, getLatestScore } = require('./services/scoreHistory');
+    const { buildCompetitorIntelligencePayload } = require('./services/competitorIntelligence');
+    const { getTracker, upsertItem, deleteItem } = require('./services/fixTracker');
+    const { buildWeeklyRecommendations, buildAiCitationBrief } = require('./services/memberBrief');
+    const { runWeeklyScoring, getEligibleDomains, getLastWeeklyRun } = require('./services/weeklyScoreScheduler');
+    const { getLatestAuditForDomain } = require('./services/auditLookup');
+
+    const domain = reqUrl.searchParams.get('domain') || '';
+
+    // GET /api/admin/summary
+    if (reqUrl.pathname === '/api/admin/summary' && req.method === 'GET') {
+      try { sendJson(res, 200, await loadAdminSummary()); } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/score?domain= or /api/score?domain=
+    if ((reqUrl.pathname === '/api/admin/score' || reqUrl.pathname === '/api/score') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try {
+        const audit = await getLatestAuditForDomain(domain);
+        if (!audit) { sendJson(res, 404, { error: 'No audit found for ' + domain }); return; }
+        const score = calculateVisibilityScore(audit);
+        await recordScore(domain, score);
+        sendJson(res, 200, { domain, score });
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/score/history or /api/score/history
+    if ((reqUrl.pathname === '/api/admin/score/history' || reqUrl.pathname === '/api/score/history') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try { sendJson(res, 200, { domain, history: await getHistoryForDomain(domain) }); } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/score/health
+    if (reqUrl.pathname === '/api/score/health' && req.method === 'GET') {
+      const eligible = await getEligibleDomains();
+      sendJson(res, 200, { eligible: eligible.length, lastRun: getLastWeeklyRun() });
+      return;
+    }
+
+    // GET /api/score/run-weekly
+    if (reqUrl.pathname === '/api/score/run-weekly' && req.method === 'GET') {
+      const dryRun = reqUrl.searchParams.get('dryRun') !== '0';
+      try {
+        const result = await runWeeklyScoring({ dryRun });
+        sendJson(res, 200, result);
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/competitors/dashboard or /api/competitors/dashboard
+    if ((reqUrl.pathname === '/api/admin/competitors/dashboard' || reqUrl.pathname === '/api/competitors/dashboard') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try { sendJson(res, 200, await buildCompetitorIntelligencePayload(domain)); } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/fix-tracker or /api/fix-tracker
+    if ((reqUrl.pathname === '/api/admin/fix-tracker' || reqUrl.pathname === '/api/fix-tracker') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try { sendJson(res, 200, { domain, items: getTracker(domain) }); } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/member/brief or /api/member/brief
+    if ((reqUrl.pathname === '/api/admin/member/brief' || reqUrl.pathname === '/api/member/brief') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try {
+        const audit = await getLatestAuditForDomain(domain);
+        if (!audit) { sendJson(res, 404, { error: 'No audit found' }); return; }
+        sendJson(res, 200, await buildWeeklyRecommendations(audit));
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/member/technical or /api/member/technical
+    if ((reqUrl.pathname === '/api/admin/member/technical' || reqUrl.pathname === '/api/member/technical') && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try {
+        const audit = await getLatestAuditForDomain(domain);
+        if (!audit) { sendJson(res, 404, { error: 'No audit found' }); return; }
+        sendJson(res, 200, await buildAiCitationBrief(audit));
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/audits/debug
+    if (reqUrl.pathname === '/api/admin/audits/debug' && req.method === 'GET') {
+      if (!domain) { sendJson(res, 400, { error: 'domain required' }); return; }
+      try {
+        const audit = await getLatestAuditForDomain(domain);
+        sendJson(res, 200, audit || { error: 'Not found' });
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // GET /api/admin/market-audits — loads all industry audit files from data/market-audits/
+    if (reqUrl.pathname === '/api/admin/market-audits' && req.method === 'GET') {
+      try {
+        const dir = path.join(ROOT, 'data', 'market-audits');
+        const files = await fsPromises.readdir(dir).catch(() => []);
+        const results = {};
+        for (const f of files) {
+          if (!f.endsWith('.json')) continue;
+          const raw = await fsPromises.readFile(path.join(dir, f), 'utf8');
+          const key = f.replace('.json', '');
+          results[key] = JSON.parse(raw);
+        }
+        sendJson(res, 200, results);
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // POST /api/leads
+    if (reqUrl.pathname === '/api/leads' && req.method === 'POST') {
+      try {
+        const body = await readBody(req);
+        const leads = JSON.parse(body);
+        const leadsPath = path.join(ROOT, 'data', 'leads.json');
+        await fsPromises.writeFile(leadsPath, JSON.stringify(leads, null, 2));
+        sendJson(res, 200, { ok: true });
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // POST /api/pipeline/
+    if (reqUrl.pathname.startsWith('/api/pipeline') && req.method === 'POST') {
+      try {
+        const body = await readBody(req);
+        const data = JSON.parse(body);
+        const pipePath = path.join(ROOT, 'data', 'pipeline.json');
+        await fsPromises.writeFile(pipePath, JSON.stringify(data, null, 2));
+        sendJson(res, 200, { ok: true });
+      } catch (e) { sendJson(res, 500, { error: e.message }); }
+      return;
+    }
+
+    // Fallback for unmatched admin routes
+    sendJson(res, 404, { error: 'Unknown admin endpoint: ' + reqUrl.pathname });
     return;
   }
 

@@ -1,5 +1,19 @@
 # Product Rules
 
+## Data Integrity — No Guessing
+
+**Every number, score, and claim in a report must come from actual verified data.**
+
+- Do NOT estimate website quality without actually crawling the site
+- Do NOT guess AI visibility without actually querying AI tools
+- Do NOT fabricate national averages or benchmarks without a real data source
+- If data is unavailable, say "not yet audited" — never fill in a guess
+- Market reports must be backed by real website audits of the businesses that show up in search
+- Admin-side data files store real audit results and update over time as businesses are re-audited
+- Any estimate or projection must be explicitly labeled as such and approved before shipping
+
+**If we haven't looked at it, we don't score it.**
+
 ## Intake Fields
 
 Audit intake supports:
