@@ -249,6 +249,7 @@
       if (sp.businessName) {
         html += '<div class="section-title">Business Profile</div>';
         html += metric('Business Name', sp.businessName);
+        html += metric('Platform/Builder', sp.platform || 'Unknown');
         html += metric('Title', sp.title);
         html += metric('H1', sp.h1);
         html += metric('Phone', sp.contactSignals?.phone ? '✓' : '✗', sp.contactSignals?.phone);

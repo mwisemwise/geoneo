@@ -669,17 +669,26 @@ function inferBusinessName({ explicitName, h1, title, hostname }) {
     return normalizedExplicit;
   }
 
-  const normalizedH1 = normalizeString(h1);
-  if (normalizedH1) {
-    return normalizedH1.slice(0, 90);
-  }
-
   const normalizedTitle = normalizeString(title);
-  if (normalizedTitle) {
-    const candidate = normalizedTitle.split(/[\-|:|•]/)[0];
+  const normalizedH1 = normalizeString(h1);
+
+  // Prefer title if H1 looks like a tagline (short exclamatory phrase, no business words)
+  const h1LooksLikeTagline = normalizedH1 && (
+    /^[A-Z][^a-z]*$/.test(normalizedH1) ||
+    /[!]{1,}/.test(normalizedH1) ||
+    normalizedH1.split(/\s+/).length <= 4 && !/\b(inc|llc|co|company|service|repair|palace|center|shop|store|studio|clinic|dental|law|auto)\b/i.test(normalizedH1)
+  );
+
+  // Use title first segment if H1 is a tagline
+  if (normalizedTitle && (!normalizedH1 || h1LooksLikeTagline)) {
+    const candidate = normalizedTitle.split(/[\-|:|•—]/)[0];
     if (normalizeString(candidate)) {
       return normalizeString(candidate).slice(0, 90);
     }
+  }
+
+  if (normalizedH1 && !h1LooksLikeTagline) {
+    return normalizedH1.slice(0, 90);
   }
 
   const domain = normalizeString(hostname).replace(/^www\./i, '');
@@ -5398,8 +5407,23 @@ async function runAudit(targetInput, marketOrContext = '') {
     },
     location: market || 'target market'
   });
+  // Detect site builder/platform
+  const platformSignals = html.toLowerCase();
+  const detectedPlatform = /squarespace/.test(platformSignals) ? 'Squarespace'
+    : /wp-content|wordpress/.test(platformSignals) ? 'WordPress'
+    : /wix\.com|wixsite/.test(platformSignals) ? 'Wix'
+    : /weebly/.test(platformSignals) ? 'Weebly'
+    : /shopify/.test(platformSignals) ? 'Shopify'
+    : /webflow/.test(platformSignals) ? 'Webflow'
+    : /godaddy/.test(platformSignals) ? 'GoDaddy'
+    : /duda/.test(platformSignals) ? 'Duda'
+    : /joomla/.test(platformSignals) ? 'Joomla'
+    : /drupal/.test(platformSignals) ? 'Drupal'
+    : 'Custom/Unknown';
+
   const siteProfile = {
     businessName: detectedBusinessName,
+    platform: detectedPlatform,
     title,
     metaDescription,
     h1: firstH1Text,
