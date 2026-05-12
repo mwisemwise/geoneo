@@ -26,6 +26,8 @@
     .saved-bar .save-btn { background: var(--brand); color: #0a0f1a; border-color: var(--brand); font-weight: 600; }
     .status { padding: 0.6rem 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; display: none; }
     .status.active { display: block; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); }
+    .status.active::before { content: ''; display: inline-block; width: 14px; height: 14px; border: 2px solid var(--brand); border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .status.error { display: block; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: #ff6b6b; }
     .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--line); margin-bottom: 1.5rem; }
     .tabs button { border: none; background: none; color: var(--muted); padding: 0.6rem 1.2rem; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
@@ -69,6 +71,15 @@
     <a class="brand" href="/admin/index.html"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
     <a href="/admin/index.html" style="color:var(--muted);font-size:0.85rem;">← Back</a>
   </header>
+  <div class="admin-layout">
+    <nav class="admin-sidebar">
+      <a href="/admin/index.html"><span class="icon">🏠</span> Dashboard</a>
+      <a href="/admin/area.html"><span class="icon">📍</span> Branson Area</a>
+      <a href="/admin/audits.html"><span class="icon">📋</span> All Audits</a>
+      <a href="/admin/business.html" class="active"><span class="icon">🔍</span> Deep View</a>
+      <a href="/admin/prospect.html"><span class="icon">🎯</span> Prospects</a>
+      <a href="/admin/leads"><span class="icon">📊</span> Leads</a>
+    </nav>
   <main class="admin-wrap">
     <h1 style="margin-bottom:0.5rem;">🔍 Business Deep View</h1>
 
@@ -103,6 +114,7 @@
       <div class="tab-panel" id="panel-email"></div>
     </div>
   </main>
+  </div>
   <script>
   (function() {
     var form = document.getElementById('auditForm');

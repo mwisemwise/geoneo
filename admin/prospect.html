@@ -21,6 +21,8 @@
     .prospect-form button { border: none; background: var(--brand); color: #0a0f1a; font-weight: 700; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.9rem; white-space: nowrap; }
     .status-bar { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.88rem; display: none; }
     .status-bar.active { display: block; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); color: var(--brand); }
+    .status-bar.active::before { content: ''; display: inline-block; width: 14px; height: 14px; border: 2px solid var(--brand); border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .status-bar.error { display: block; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: #ff6b6b; }
     .results-grid { display: grid; gap: 1rem; }
     .prospect-card { border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem; background: var(--surface); }
