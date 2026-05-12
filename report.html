@@ -53,9 +53,19 @@
     .cta-box h3 { margin: 0 0 0.5rem; }
     .cta-box p { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
     .loading-state { text-align: center; padding: 4rem 1rem; }
-    .loading-state .spinner { width: 40px; height: 40px; border: 4px solid var(--line); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     .loading-state p { color: var(--muted); }
+    .progress-steps { display: flex; gap: 0; margin: 0 auto 1.5rem; max-width: 480px; }
+    .progress-step { flex: 1; text-align: center; position: relative; }
+    .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; margin: 0 auto 0.4rem; font-size: 0.7rem; font-weight: 700; color: var(--muted); transition: all 0.3s; }
+    .progress-step.active .step-dot { border-color: var(--brand); background: rgba(0,229,160,0.12); color: var(--brand); }
+    .progress-step.done .step-dot { border-color: var(--brand); background: var(--brand); color: #0a0f1a; }
+    .progress-step .step-label { font-size: 0.68rem; color: var(--muted); transition: color 0.3s; }
+    .progress-step.active .step-label { color: var(--ink); }
+    .progress-step.done .step-label { color: var(--brand); }
+    .progress-step::after { content: ''; position: absolute; top: 13px; left: 50%; width: 100%; height: 2px; background: var(--line); z-index: -1; }
+    .progress-step:last-child::after { display: none; }
+    .progress-step.done::after { background: var(--brand); }
+    .loading-eta { font-size: 0.82rem; color: var(--muted); margin-top: 0.5rem; }
     .error-state { text-align: center; padding: 3rem 1rem; }
     .error-state h2 { color: #ff6b6b; }
     .error-state p { color: var(--muted); }
@@ -76,8 +86,15 @@
 
   <main class="report-wrap" id="reportMain">
     <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <p id="loadingMsg">Scanning your business visibility...</p>
+      <div class="progress-steps" id="progressSteps">
+        <div class="progress-step active"><div class="step-dot">1</div><div class="step-label">Google</div></div>
+        <div class="progress-step"><div class="step-dot">2</div><div class="step-label">Maps</div></div>
+        <div class="progress-step"><div class="step-dot">3</div><div class="step-label">Directories</div></div>
+        <div class="progress-step"><div class="step-dot">4</div><div class="step-label">AI Search</div></div>
+        <div class="progress-step"><div class="step-dot">5</div><div class="step-label">Report</div></div>
+      </div>
+      <p id="loadingMsg">Checking Google Search rankings...</p>
+      <p class="loading-eta">Usually takes about 60 seconds</p>
     </div>
   </main>
 
@@ -127,16 +144,18 @@
       'Scanning Google Maps presence...',
       'Checking directory listings...',
       'Analyzing AI search visibility...',
-      'Comparing against local competitors...',
       'Building your report...'
     ];
     var msgIdx = 0;
+    var steps = document.querySelectorAll('.progress-step');
     var msgInterval = setInterval(function() {
+      if (msgIdx < steps.length) { steps[msgIdx].classList.remove('active'); steps[msgIdx].classList.add('done'); steps[msgIdx].querySelector('.step-dot').textContent = '✓'; }
       msgIdx++;
       if (msgIdx < msgs.length) {
         document.getElementById('loadingMsg').textContent = msgs[msgIdx];
+        if (steps[msgIdx]) steps[msgIdx].classList.add('active');
       }
-    }, 8000);
+    }, 10000);
 
     var mode = ''; // set in renderReport, used by gradeFromScore
 

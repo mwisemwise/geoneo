@@ -7,7 +7,14 @@
   <meta name="robots" content="noindex" />
   <link rel="stylesheet" href="/styles.css" />
   <style>
-    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+    .admin-layout { display: flex; min-height: calc(100vh - 60px); }
+    .admin-sidebar { width: 200px; border-right: 1px solid var(--line); padding: 1.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; position: sticky; top: 60px; height: calc(100vh - 60px); }
+    .admin-sidebar a { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.75rem; border-radius: 8px; font-size: 0.85rem; color: var(--muted); text-decoration: none; transition: all 0.15s; }
+    .admin-sidebar a:hover { background: rgba(0,229,160,0.06); color: var(--ink); }
+    .admin-sidebar a.active { background: rgba(0,229,160,0.1); color: var(--brand); font-weight: 600; }
+    .admin-sidebar .icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+    @media (max-width: 768px) { .admin-sidebar { display: none; } }
+    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; flex: 1; }
     .toolbar { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
     .toolbar select, .toolbar input { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); padding: 0.5rem 0.7rem; border-radius: 8px; font-family: inherit; font-size: 0.85rem; }
     .toolbar input { width: 180px; }
@@ -56,6 +63,15 @@
     <a class="brand" href="/admin/index.html"><span class="brand-mark">G</span><span class="brand-text">GeoNeo Admin</span></a>
     <a href="/admin/index.html" style="color:var(--muted);font-size:0.85rem;">← Back</a>
   </header>
+  <div class="admin-layout">
+    <nav class="admin-sidebar">
+      <a href="/admin/index.html"><span class="icon">🏠</span> Dashboard</a>
+      <a href="/admin/area.html" class="active"><span class="icon">📍</span> Branson Area</a>
+      <a href="/admin/audits.html"><span class="icon">📋</span> All Audits</a>
+      <a href="/admin/business.html"><span class="icon">🔍</span> Deep View</a>
+      <a href="/admin/prospect.html"><span class="icon">🎯</span> Prospects</a>
+      <a href="/admin/leads"><span class="icon">📊</span> Leads</a>
+    </nav>
   <main class="admin-wrap">
     <h1 style="margin-bottom:0.5rem;">📍 Branson Area Businesses</h1>
     <div class="toolbar">
@@ -67,6 +83,7 @@
     <div class="avg-bar" id="avgBar"></div>
     <div class="biz-grid" id="bizGrid"><p style="color:var(--muted)">Loading...</p></div>
   </main>
+  </div>
 
   <div class="modal-bg" id="modalBg">
     <div class="modal" id="modal"></div>
@@ -278,22 +295,22 @@
       var strengthsList = (analysis.strengths || []).slice(0, 3);
       var oppsList = (analysis.opportunities || []).slice(0, 3);
 
-      return 'Subject: I audited ' + (biz.industry || 'business') + ' websites in Branson — here are your results\n\n'
+      return 'Subject: Your ' + (biz.industry || 'business') + ' website vs. Branson competitors\n\n'
         + 'Hi ' + name + ',\n\n'
-        + 'I did an audit on ' + (biz.industry || 'business') + ' websites in the Branson area and here are the results for your website (' + biz.website + ') vs. your competitors.\n\n'
-        + '📊 YOUR SCORE: ' + biz.score + '/100\n\n'
-        + '✅ WHAT YOU\'RE DOING WELL:\n'
-        + (strengthsList.length ? strengthsList.map(function(s){return '• ' + s;}).join('\n') : '• You have a live website (that puts you ahead of many)')
+        + 'I audited ' + (biz.industry || 'business') + ' websites in the Branson area and wanted to share your results.\n\n'
+        + 'Your site (' + biz.website + ') scored ' + biz.score + '/100 compared to your local competitors.\n\n'
+        + '✅ What you\'re doing well:\n'
+        + (strengthsList.length ? strengthsList.map(function(s){return '• ' + s;}).join('\n') : '• You have a live website (ahead of many)')
         + '\n\n'
-        + '🚀 OPPORTUNITIES:\n'
+        + '🚀 Where you can grow:\n'
         + (oppsList.length ? oppsList.map(function(o){return '• ' + o;}).join('\n') : '• Several quick wins available')
         + '\n\n'
-        + 'The real opportunity for you is that no one is set up for AI citations in ' + (biz.industry || 'your industry') + ' in Branson. People are using AI to make buying decisions more and more every day — when someone asks ChatGPT or Google AI "who\'s the best ' + (biz.industry || 'service') + ' in Branson," the businesses set up correctly are the ones getting recommended and contacted.\n\n'
-        + 'Right now, that spot is wide open. Branson is still early compared to bigger markets — businesses that move now can secure the top positions before competitors catch on.\n\n'
-        + 'You get out of your website what you put into it. When done correctly, improvements are directly proportional to more business for your company.\n\n'
-        + 'If you\'d like to speak with us about securing your spot at the top of AI citations, contact us via email: hello@geoneo.ai\n\n'
-        + 'We\'re local (right here in Branson) and even our smallest package includes phone support — you\'ll always have someone to call.\n\n'
-        + 'Best,\nMatt\nGeoNeo AI — Branson, MO\nhello@geoneo.ai';
+        + 'Here\'s the real opportunity: no one in ' + (biz.industry || 'your industry') + ' in Branson is set up for AI citations yet. People are using AI to make buying decisions every day now — "who\'s the best ' + (biz.industry || 'service') + ' in Branson?" — and the businesses set up correctly are the ones getting recommended.\n\n'
+        + 'That spot is wide open right now. Branson is early compared to bigger markets, so businesses that move now secure the top positions before competitors catch on.\n\n'
+        + 'You get out of your website what you put into it — when done correctly, improvements are directly proportional to more business for your company.\n\n'
+        + 'If you\'d like to see the full report or talk about securing your AI citation spot, just reply to this email.\n\n'
+        + 'We\'re local (Branson) and even our smallest package includes phone support — you\'ll always have someone to call.\n\n'
+        + '— Matt\nGeoNeo AI, Branson MO\nhello@geoneo.ai';
     }
 
     function detectOwner(audit) {
