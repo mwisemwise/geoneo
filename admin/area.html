@@ -278,23 +278,21 @@
       var strengthsList = (analysis.strengths || []).slice(0, 3);
       var oppsList = (analysis.opportunities || []).slice(0, 3);
 
-      return 'Subject: Quick wins for ' + biz.name + ' — free visibility check (' + biz.score + '/100)\n\n'
+      return 'Subject: I audited ' + (biz.industry || 'business') + ' websites in Branson — here are your results\n\n'
         + 'Hi ' + name + ',\n\n'
-        + 'I\'m Matt with GeoNeo AI — we\'re a local Branson company that helps businesses get found online. I ran a quick visibility check on your website and wanted to share what I found.\n\n'
-        + '📊 YOUR VISIBILITY SCORE: ' + biz.score + '/100\n\n'
+        + 'I did an audit on ' + (biz.industry || 'business') + ' websites in the Branson area and here are the results for your website (' + biz.website + ') vs. your competitors.\n\n'
+        + '📊 YOUR SCORE: ' + biz.score + '/100\n\n'
         + '✅ WHAT YOU\'RE DOING WELL:\n'
-        + (strengthsList.length ? strengthsList.map(function(s,i){return '• ' + s;}).join('\n') : '• You have a website (that puts you ahead of many!)')
+        + (strengthsList.length ? strengthsList.map(function(s){return '• ' + s;}).join('\n') : '• You have a live website (that puts you ahead of many)')
         + '\n\n'
-        + '🚀 OPPORTUNITIES TO GROW:\n'
-        + (oppsList.length ? oppsList.map(function(o,i){return '• ' + o;}).join('\n') : '• Several quick wins available')
+        + '🚀 OPPORTUNITIES:\n'
+        + (oppsList.length ? oppsList.map(function(o){return '• ' + o;}).join('\n') : '• Several quick wins available')
         + '\n\n'
-        + 'Here\'s the thing about Branson right now: compared to most markets, the competition online is still wide open. Businesses that make improvements now can move up the rankings much faster than in larger cities. The window won\'t stay open forever, but right now is the best time to act.\n\n'
-        + 'Why it matters: ranking = revenue. Every position you move up directly translates to more business for your company. And the biggest shift happening right now is AI citations — when someone asks ChatGPT or Google AI "who\'s the best ' + (biz.industry || 'service') + ' in Branson," the businesses set up correctly are the ones getting recommended. That\'s where the next wave of customers is coming from.\n\n'
-        + 'The good news: you get out of your website what you put into it. When done correctly, these improvements are directly proportional to more business for your company.\n\n'
-        + '---\n\n'
-        + 'What makes us different: we\'re local (right here in Branson), and even our smallest package includes phone support. You\'ll always have someone to call.\n\n'
-        + 'I\'d be happy to walk you through the full report — no cost, no pressure. Just want to help local businesses get found.\n\n'
-        + 'Would a quick 10-minute call work for you this week?\n\n'
+        + 'The real opportunity for you is that no one is set up for AI citations in ' + (biz.industry || 'your industry') + ' in Branson. People are using AI to make buying decisions more and more every day — when someone asks ChatGPT or Google AI "who\'s the best ' + (biz.industry || 'service') + ' in Branson," the businesses set up correctly are the ones getting recommended and contacted.\n\n'
+        + 'Right now, that spot is wide open. Branson is still early compared to bigger markets — businesses that move now can secure the top positions before competitors catch on.\n\n'
+        + 'You get out of your website what you put into it. When done correctly, improvements are directly proportional to more business for your company.\n\n'
+        + 'If you\'d like to speak with us about securing your spot at the top of AI citations, contact us via email: hello@geoneo.ai\n\n'
+        + 'We\'re local (right here in Branson) and even our smallest package includes phone support — you\'ll always have someone to call.\n\n'
         + 'Best,\nMatt\nGeoNeo AI — Branson, MO\nhello@geoneo.ai';
     }
 
