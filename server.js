@@ -5572,7 +5572,8 @@ function buildAdminLeadsHtml(records) {
         ? (record.localSearchVisibility || record.fullAuditResult.localSearchVisibility)
         : {};
       const localSummary = localVisibility.summary || {};
-      const localFound = `${Number(localSummary.foundInOrganicCount) || 0}/5`;
+      const localDataValid = Number(localSummary.totalQueries) > 0 && (Number(localSummary.foundInOrganicCount) > 0 || Number(localSummary.topCompetitorAppearanceCount) > 0);
+      const localFound = localDataValid ? `${Number(localSummary.foundInOrganicCount) || 0}/${Number(localSummary.totalQueries) || 5}` : 'N/A';
       const localCompetitors = Array.isArray(localVisibility.topRecurringCompetitors)
         ? localVisibility.topRecurringCompetitors.slice(0, 3).map((item) => item.domain).join(', ')
         : '';
