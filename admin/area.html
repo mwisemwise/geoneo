@@ -178,9 +178,12 @@
 
     function openModal(biz) {
       var notes = getNotes(biz.id);
-      var email = buildEmail(biz, notes);
+      var analysis = analyzeStrengthsOpportunities(biz);
+      var email = notes.emailBody || buildEmail(biz, notes, analysis);
       modal.innerHTML = '<h2>' + esc(biz.name) + '</h2>'
         + '<div class="scores-mini"><span>Overall: ' + biz.score + '</span><span>SEO: ' + biz.seo + '</span><span>Local: ' + biz.geo + '</span><span>AI: ' + biz.ai + '</span><span>Owner: ' + (biz.owner || 'none') + '</span></div>'
+        + '<div class="field"><label>✅ What They Do Well</label><div id="m-strengths" style="font-size:0.82rem;margin-bottom:0.5rem;">' + analysis.strengths.map(function(s){return '<div style="padding:0.2rem 0;color:var(--brand)">✓ '+esc(s)+'</div>';}).join('') + (analysis.strengths.length?'':'<div style="color:var(--muted)">No strong signals detected yet</div>') + '</div></div>'
+        + '<div class="field"><label>🚀 Opportunities (Growth Areas)</label><div id="m-opps" style="font-size:0.82rem;margin-bottom:0.5rem;">' + analysis.opportunities.map(function(o){return '<div style="padding:0.2rem 0;color:#ffa657">○ '+esc(o)+'</div>';}).join('') + '</div></div>'
         + '<div class="field"><label>Website</label><input id="m-website" value="' + esc(biz.website) + '" /></div>'
         + '<div class="field"><label>Industry</label><input id="m-industry" value="' + esc(biz.industry) + '" /></div>'
         + '<div class="field"><label>SEO Done By</label><select id="m-owner"><option value="none"' + (biz.owner==='none'?' selected':'') + '>None/Unknown</option><option value="pro"' + (biz.owner==='pro'?' selected':'') + '>Pro Agency</option><option value="diy"' + (biz.owner==='diy'?' selected':'') + '>DIY</option><option value="local"' + (biz.owner==='local'?' selected':'') + '>Hired Local</option></select></div>'
@@ -200,7 +203,6 @@
           owner: document.getElementById('m-owner').value,
           emailBody: document.getElementById('m-emailBody').value
         });
-        // Update local data
         biz.owner = document.getElementById('m-owner').value;
         applyFilters();
         alert('Saved!');
@@ -214,18 +216,85 @@
 
     modalBg.addEventListener('click', function(e) { if (e.target === modalBg) modalBg.classList.remove('show'); });
 
-    function buildEmail(biz, notes) {
+    function analyzeStrengthsOpportunities(biz) {
+      var checks = biz.raw.fullAuditResult?.checks || biz.raw.customerResult?.checks || [];
+      var strengths = [];
+      var opportunities = [];
+
+      // Check each audit item
+      checks.forEach(function(c) {
+        if (!c) return;
+        if (c.status === 'PASS') {
+          // Translate to plain English strength
+          var s = {
+            'title': 'Page title is well-structured',
+            'meta-description': 'Meta description is set up correctly',
+            'h1': 'Clear main heading on the page',
+            'canonical': 'Proper canonical URL configured',
+            'robots-meta': 'Search engine directives are set',
+            'og-tags': 'Social sharing previews configured',
+            'structured-data': 'Business info structured for Google',
+            'image-alt': 'Images have proper descriptions',
+            'sitemap': 'Sitemap helps Google find all pages',
+            'robots-txt': 'Robots.txt is properly configured',
+            'local-geo': 'Local location signals present',
+            'trust-signals': 'Trust and credibility signals on site',
+            'faq-citation': 'Q&A content ready for AI citations',
+            'grammar': 'Professional writing quality',
+            'google-seo': 'Google SEO grade is healthy'
+          }[c.key];
+          if (s) strengths.push(s);
+        } else {
+          // Translate to opportunity (positive framing)
+          var o = {
+            'title': 'Opportunity to improve page title for better click-through from search results',
+            'meta-description': 'Opportunity to add a compelling description that shows up in Google results',
+            'h1': 'Opportunity to clarify the main message for visitors and search engines',
+            'canonical': 'Opportunity to prevent duplicate content confusion',
+            'robots-meta': 'Opportunity to give search engines clearer instructions',
+            'og-tags': 'Opportunity to control how your site looks when shared on social media',
+            'structured-data': 'Opportunity to help Google and AI understand your business better',
+            'image-alt': 'Opportunity to make images work harder for search visibility',
+            'sitemap': 'Opportunity to help Google discover all your pages faster',
+            'robots-txt': 'Opportunity to improve how search engines crawl your site',
+            'local-geo': 'Opportunity to strengthen local presence signals for Maps and "near me" searches',
+            'trust-signals': 'Opportunity to build more credibility and convert more visitors to calls',
+            'faq-citation': 'Opportunity to get recommended by AI search tools (ChatGPT, Google AI)',
+            'grammar': 'Opportunity to polish content for a more professional impression',
+            'google-seo': 'Opportunity to improve Google\'s technical assessment of your site',
+            'thin-content': 'Opportunity to add more helpful content that builds trust with visitors',
+            'paragraph-depth': 'Opportunity to expand content depth for better engagement',
+            'repetitive-content': 'Opportunity to diversify content for a fresher feel'
+          }[c.key];
+          if (o) opportunities.push(o);
+        }
+      });
+
+      return { strengths: strengths, opportunities: opportunities };
+    }
+
+    function buildEmail(biz, notes, analysis) {
       var name = notes.contact || biz.name;
-      return 'Subject: Free visibility audit for ' + biz.name + ' — ' + biz.score + '/100\n\n'
+      var strengthsList = (analysis.strengths || []).slice(0, 3);
+      var oppsList = (analysis.opportunities || []).slice(0, 3);
+
+      return 'Subject: Quick wins for ' + biz.name + ' — free visibility check (' + biz.score + '/100)\n\n'
         + 'Hi ' + name + ',\n\n'
-        + 'I was researching ' + (biz.industry || 'businesses') + ' in Branson and ran a free visibility audit on your website (' + biz.website + ').\n\n'
-        + '📊 YOUR SCORE: ' + biz.score + '/100\n\n'
-        + '🔍 TOP ISSUES:\n' + (biz.topFixes.length ? biz.topFixes.slice(0,3).map(function(f,i){return (i+1)+'. '+f;}).join('\n') : '1. Visibility issues found\n2. Missing local signals\n3. Not optimized for AI search')
-        + '\n\n🏆 YOUR COMPETITION:\nOther ' + (biz.industry || '') + ' businesses in Branson are outranking you in Google Search, Maps, and AI recommendations.\n\n'
-        + '💰 ESTIMATED IMPACT:\nBased on your industry, these issues are likely costing you customers every month.\n\n'
+        + 'I\'m Matt with GeoNeo AI — we\'re a local Branson company that helps businesses get found online. I ran a quick visibility check on your website and wanted to share what I found.\n\n'
+        + '📊 YOUR VISIBILITY SCORE: ' + biz.score + '/100\n\n'
+        + '✅ WHAT YOU\'RE DOING WELL:\n'
+        + (strengthsList.length ? strengthsList.map(function(s,i){return '• ' + s;}).join('\n') : '• You have a website (that puts you ahead of many!)')
+        + '\n\n'
+        + '🚀 OPPORTUNITIES TO GROW:\n'
+        + (oppsList.length ? oppsList.map(function(o,i){return '• ' + o;}).join('\n') : '• Several quick wins available')
+        + '\n\n'
+        + 'The good news: you get out of your website what you put into it — and when done correctly, these improvements directly translate to more phone calls and customers.\n\n'
+        + 'Every one of these is an opportunity to get ahead of your competition. Most ' + (biz.industry || 'businesses') + ' in Branson aren\'t doing this, which means there\'s room to stand out.\n\n'
         + '---\n\n'
-        + 'I\'d be happy to send you the full detailed report — no cost, no strings.\n\nWant me to send it over?\n\n'
-        + 'Best,\nMatt\nGeoNeo AI\nhello@geoneo.ai';
+        + 'What makes us different: we\'re local (right here in Branson), and even our smallest package includes phone support. You\'ll always have someone to call.\n\n'
+        + 'I\'d be happy to walk you through the full report over the phone — no cost, no pressure. Just want to help local businesses get found.\n\n'
+        + 'Would a quick 10-minute call work for you this week?\n\n'
+        + 'Best,\nMatt\nGeoNeo AI — Branson, MO\nhello@geoneo.ai';
     }
 
     function detectOwner(audit) {
