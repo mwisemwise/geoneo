@@ -92,7 +92,29 @@
 
     <form class="input-bar" id="auditForm">
       <input type="text" name="url" placeholder="Website URL" required />
-      <input type="text" name="industry" placeholder="Industry" />
+      <select name="industry" style="width:150px;">
+        <option value="">Industry...</option>
+        <option value="shows and attractions">Shows & Attractions</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="hotel">Hotels & Lodging</option>
+        <option value="restaurant">Restaurants</option>
+        <option value="towing">Towing</option>
+        <option value="plumbing">Plumbing</option>
+        <option value="hvac">HVAC</option>
+        <option value="roofing">Roofing</option>
+        <option value="electrician">Electrician</option>
+        <option value="pest control">Pest Control</option>
+        <option value="tree service">Tree Service</option>
+        <option value="garage door">Garage Door</option>
+        <option value="restoration">Restoration</option>
+        <option value="dental">Dental</option>
+        <option value="legal">Legal</option>
+        <option value="fishing guide">Fishing Guide</option>
+        <option value="cleaning">Cleaning</option>
+        <option value="landscaping">Landscaping</option>
+        <option value="auto repair">Auto Repair</option>
+        <option value="real estate">Real Estate</option>
+      </select>
       <input type="text" name="city" placeholder="City" />
       <input type="text" name="state" placeholder="ST" maxlength="2" />
       <button type="submit">Run Full Audit</button>
@@ -187,7 +209,7 @@
     if (params.get('industry')) form.industry.value = params.get('industry');
     if (params.get('city')) form.city.value = params.get('city');
     if (params.get('state')) form.state.value = params.get('state');
-    if (params.get('url')) runAudit();
+    if (params.get('url')) { if (params.get('city')) form.city.value = params.get('city'); runAudit(); }
 
     form.addEventListener('submit', function(e) { e.preventDefault(); runAudit(); });
 
